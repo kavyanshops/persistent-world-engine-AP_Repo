@@ -7,8 +7,9 @@
 #          ./benchmarks/run_benchmark.sh capstone after 3 sql/06_optimized_queries.sql
 #
 # Connection settings come from the usual libpq variables (PGHOST, PGPORT, PGUSER).
-# Queries are split on "-- @R1" / "-- @W1" marker lines; "-- @END" stops collection.
-#
+# 
+#Queries are split on "-- @R1" / "-- @W1" marker lines; "-- @END" stops collection.
+
 # WRITE queries (W*) run inside BEGIN ... ROLLBACK, so your data does not change.
 set -euo pipefail
 
@@ -50,13 +51,19 @@ for f in $(ls "$TMP"/*.sql | sort -V); do
   sorted=($(printf '%s\n' "${times[@]}" | sort -g))
   median="${sorted[$((RUNS / 2))]}"
   avg="$(printf '%s\n' "${times[@]}" | awk '{ s += $1 } END { printf "%.3f", s / NR }')"
+
   # every scan node in the last run's plan, e.g. "Seq Scan on orders | Index Scan using customers_pkey on customers"
+
   node="$(echo "$plan" | grep -oE '(Parallel )?(Seq Scan|Index Scan|Index Only Scan|Bitmap Heap Scan|Bitmap Index Scan)( Backward)?( using [a-z0-9_]+)? on [a-z0-9_]+' | sed -E 's/Parallel //; s/ Backward//' | awk '!seen[$0]++' | paste -sd'|' - | sed 's/|/ | /g' || true)"
+
   # grep exits 1 when nothing matches (e.g. a plain INSERT); don't let set -e abort the run
+
   node="${node:-(no scan)}"
   echo "$id,$type,$avg,$median,${sorted[0]},${sorted[$((RUNS - 1))]},$node" >> "$SUMMARY"
   printf '%-4s %-5s avg %9s ms   %s\n' "$id" "$type" "$avg" "$node"
 done
+
 rm -rf "$TMP"
+
 echo "Workload: $WORKLOAD"
 echo "Saved raw plans and summary to $OUT"

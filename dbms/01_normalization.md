@@ -5,7 +5,7 @@ The source files contain cities, localities, customers, restaurants, menu
 items, delivery partners, coupons, orders, order items, payments, and reviews.
 The design uses surrogate identifiers where the export already provides them
 and keeps business identifiers such as `email`, `phone`, and `coupon_code`
-unique.
+unique. The primary goal of this process is to eliminate data redundancy, prevent update anomalies, and establish a robust relational schema.
 
 ## 0. Unnormalized starting point
 
