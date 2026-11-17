@@ -1,0 +1,39 @@
+=== R03 run 1 ===
+Sort  (cost=1081.40..1081.45 rows=19 width=29) (actual time=1.918..1.919 rows=18.00 loops=1)
+  Sort Key: category, is_bestseller DESC, item_name
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=464
+  ->  Seq Scan on menu_items  (cost=0.00..1081.00 rows=19 width=29) (actual time=0.165..1.893 rows=18.00 loops=1)
+        Filter: (is_available AND (restaurant_id = 217))
+        Rows Removed by Filter: 49982
+        Buffers: shared hit=456
+Planning:
+  Buffers: shared hit=111
+Planning Time: 0.158 ms
+Execution Time: 1.936 ms
+=== R03 run 2 ===
+Sort  (cost=1081.40..1081.45 rows=19 width=29) (actual time=1.866..1.866 rows=18.00 loops=1)
+  Sort Key: category, is_bestseller DESC, item_name
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=464
+  ->  Seq Scan on menu_items  (cost=0.00..1081.00 rows=19 width=29) (actual time=0.164..1.843 rows=18.00 loops=1)
+        Filter: (is_available AND (restaurant_id = 217))
+        Rows Removed by Filter: 49982
+        Buffers: shared hit=456
+Planning:
+  Buffers: shared hit=111
+Planning Time: 0.153 ms
+Execution Time: 1.882 ms
+=== R03 run 3 ===
+Sort  (cost=1081.40..1081.45 rows=19 width=29) (actual time=1.841..1.842 rows=18.00 loops=1)
+  Sort Key: category, is_bestseller DESC, item_name
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=464
+  ->  Seq Scan on menu_items  (cost=0.00..1081.00 rows=19 width=29) (actual time=0.148..1.820 rows=18.00 loops=1)
+        Filter: (is_available AND (restaurant_id = 217))
+        Rows Removed by Filter: 49982
+        Buffers: shared hit=456
+Planning:
+  Buffers: shared hit=111
+Planning Time: 0.138 ms
+Execution Time: 1.856 ms

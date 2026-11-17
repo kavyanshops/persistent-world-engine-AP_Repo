@@ -1,0 +1,81 @@
+=== R17 run 1 ===
+Sort  (cost=7636.69..7642.50 rows=2325 width=12) (actual time=15.654..15.670 rows=834.00 loops=1)
+  Sort Key: (count(*)) DESC, o.customer_id
+  Sort Method: quicksort  Memory: 51kB
+  Buffers: shared hit=3454
+  ->  HashAggregate  (cost=7419.51..7506.69 rows=2325 width=12) (actual time=15.353..15.541 rows=834.00 loops=1)
+        Group Key: o.customer_id
+        Filter: (count(*) >= 2)
+        Batches: 1  Memory Usage: 409kB
+        Rows Removed by Filter: 5220
+        Buffers: shared hit=3448
+        ->  Hash Join  (cost=2964.40..7384.64 rows=6974 width=4) (actual time=4.652..14.754 rows=6965.00 loops=1)
+              Hash Cond: (o.order_id = p.order_id)
+              Buffers: shared hit=3448
+              ->  Seq Scan on orders o  (cost=0.00..3788.00 rows=150000 width=8) (actual time=0.003..3.909 rows=150000.00 loops=1)
+                    Buffers: shared hit=2288
+              ->  Hash  (cost=2877.23..2877.23 rows=6974 width=4) (actual time=4.641..4.641 rows=6965.00 loops=1)
+                    Buckets: 8192  Batches: 1  Memory Usage: 309kB
+                    Buffers: shared hit=1160
+                    ->  Seq Scan on payments p  (cost=0.00..2877.23 rows=6974 width=4) (actual time=0.003..4.361 rows=6965.00 loops=1)
+                          Filter: (payment_status = 'FAILED'::text)
+                          Rows Removed by Filter: 130413
+                          Buffers: shared hit=1160
+Planning:
+  Buffers: shared hit=156
+Planning Time: 0.259 ms
+Execution Time: 15.724 ms
+=== R17 run 2 ===
+Sort  (cost=7636.69..7642.50 rows=2325 width=12) (actual time=14.909..14.925 rows=834.00 loops=1)
+  Sort Key: (count(*)) DESC, o.customer_id
+  Sort Method: quicksort  Memory: 51kB
+  Buffers: shared hit=3454
+  ->  HashAggregate  (cost=7419.51..7506.69 rows=2325 width=12) (actual time=14.637..14.803 rows=834.00 loops=1)
+        Group Key: o.customer_id
+        Filter: (count(*) >= 2)
+        Batches: 1  Memory Usage: 409kB
+        Rows Removed by Filter: 5220
+        Buffers: shared hit=3448
+        ->  Hash Join  (cost=2964.40..7384.64 rows=6974 width=4) (actual time=4.538..14.075 rows=6965.00 loops=1)
+              Hash Cond: (o.order_id = p.order_id)
+              Buffers: shared hit=3448
+              ->  Seq Scan on orders o  (cost=0.00..3788.00 rows=150000 width=8) (actual time=0.003..3.627 rows=150000.00 loops=1)
+                    Buffers: shared hit=2288
+              ->  Hash  (cost=2877.23..2877.23 rows=6974 width=4) (actual time=4.525..4.526 rows=6965.00 loops=1)
+                    Buckets: 8192  Batches: 1  Memory Usage: 309kB
+                    Buffers: shared hit=1160
+                    ->  Seq Scan on payments p  (cost=0.00..2877.23 rows=6974 width=4) (actual time=0.003..4.238 rows=6965.00 loops=1)
+                          Filter: (payment_status = 'FAILED'::text)
+                          Rows Removed by Filter: 130413
+                          Buffers: shared hit=1160
+Planning:
+  Buffers: shared hit=156
+Planning Time: 0.256 ms
+Execution Time: 14.980 ms
+=== R17 run 3 ===
+Sort  (cost=7636.69..7642.50 rows=2325 width=12) (actual time=14.911..14.925 rows=834.00 loops=1)
+  Sort Key: (count(*)) DESC, o.customer_id
+  Sort Method: quicksort  Memory: 51kB
+  Buffers: shared hit=3454
+  ->  HashAggregate  (cost=7419.51..7506.69 rows=2325 width=12) (actual time=14.630..14.811 rows=834.00 loops=1)
+        Group Key: o.customer_id
+        Filter: (count(*) >= 2)
+        Batches: 1  Memory Usage: 409kB
+        Rows Removed by Filter: 5220
+        Buffers: shared hit=3448
+        ->  Hash Join  (cost=2964.40..7384.64 rows=6974 width=4) (actual time=4.185..14.034 rows=6965.00 loops=1)
+              Hash Cond: (o.order_id = p.order_id)
+              Buffers: shared hit=3448
+              ->  Seq Scan on orders o  (cost=0.00..3788.00 rows=150000 width=8) (actual time=0.004..3.741 rows=150000.00 loops=1)
+                    Buffers: shared hit=2288
+              ->  Hash  (cost=2877.23..2877.23 rows=6974 width=4) (actual time=4.172..4.173 rows=6965.00 loops=1)
+                    Buckets: 8192  Batches: 1  Memory Usage: 309kB
+                    Buffers: shared hit=1160
+                    ->  Seq Scan on payments p  (cost=0.00..2877.23 rows=6974 width=4) (actual time=0.004..3.912 rows=6965.00 loops=1)
+                          Filter: (payment_status = 'FAILED'::text)
+                          Rows Removed by Filter: 130413
+                          Buffers: shared hit=1160
+Planning:
+  Buffers: shared hit=156
+Planning Time: 0.283 ms
+Execution Time: 14.981 ms

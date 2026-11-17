@@ -1,0 +1,33 @@
+=== W05 run 1 ===
+Update on customers  (cost=0.00..731.65 rows=0 width=0) (actual time=32.948..32.948 rows=0.00 loops=1)
+  Buffers: shared hit=21618 dirtied=18 written=18
+  ->  Seq Scan on customers  (cost=0.00..731.65 rows=214 width=7) (actual time=0.005..1.134 rows=1230.00 loops=1)
+        Filter: (is_gold_member AND (gold_expires_on < '2026-07-01'::date))
+        Rows Removed by Filter: 23770
+        Buffers: shared hit=373
+Planning:
+  Buffers: shared hit=89
+Planning Time: 0.159 ms
+Execution Time: 32.989 ms
+=== W05 run 2 ===
+Update on customers  (cost=0.00..763.04 rows=0 width=0) (actual time=8.974..8.974 rows=0.00 loops=1)
+  Buffers: shared hit=21601 dirtied=18 written=18
+  ->  Seq Scan on customers  (cost=0.00..763.04 rows=223 width=7) (actual time=0.007..1.290 rows=1230.00 loops=1)
+        Filter: (is_gold_member AND (gold_expires_on < '2026-07-01'::date))
+        Rows Removed by Filter: 23770
+        Buffers: shared hit=389
+Planning:
+  Buffers: shared hit=89
+Planning Time: 0.175 ms
+Execution Time: 9.019 ms
+=== W05 run 3 ===
+Update on customers  (cost=0.00..794.42 rows=0 width=0) (actual time=7.957..7.958 rows=0.00 loops=1)
+  Buffers: shared hit=21736 dirtied=16 written=16
+  ->  Seq Scan on customers  (cost=0.00..794.42 rows=232 width=7) (actual time=0.007..1.240 rows=1230.00 loops=1)
+        Filter: (is_gold_member AND (gold_expires_on < '2026-07-01'::date))
+        Rows Removed by Filter: 23770
+        Buffers: shared hit=405
+Planning:
+  Buffers: shared hit=89
+Planning Time: 0.157 ms
+Execution Time: 7.997 ms

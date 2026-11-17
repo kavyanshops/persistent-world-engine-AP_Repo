@@ -1,0 +1,69 @@
+=== W02 run 1 ===
+Update on orders  (cost=4163.44..4171.45 rows=0 width=0) (actual time=11.131..11.132 rows=0.00 loops=1)
+  Buffers: shared hit=2354 dirtied=1
+  InitPlan 1
+    ->  Limit  (cost=4163.02..4163.02 rows=1 width=12) (actual time=10.910..10.911 rows=1.00 loops=1)
+          Buffers: shared hit=2291
+          ->  Sort  (cost=4163.02..4163.02 rows=3 width=12) (actual time=10.910..10.910 rows=1.00 loops=1)
+                Sort Key: orders_1.placed_at
+                Sort Method: top-N heapsort  Memory: 25kB
+                Buffers: shared hit=2291
+                ->  Seq Scan on orders orders_1  (cost=0.00..4163.00 rows=3 width=12) (actual time=10.883..10.901 rows=37.00 loops=1)
+                      Filter: ((partner_id IS NULL) AND (status = 'ACCEPTED'::text))
+                      Rows Removed by Filter: 149963
+                      Buffers: shared hit=2288
+  ->  Index Scan using orders_pkey on orders  (cost=0.42..8.44 rows=1 width=42) (actual time=10.921..10.923 rows=1.00 loops=1)
+        Index Cond: (order_id = (InitPlan 1).col1)
+        Index Searches: 1
+        Buffers: shared hit=2297
+Planning:
+  Buffers: shared hit=99
+Planning Time: 0.158 ms
+Trigger for constraint orders_partner_id_fkey: time=0.295 calls=1
+Execution Time: 11.478 ms
+=== W02 run 2 ===
+Update on orders  (cost=4163.44..4171.45 rows=0 width=0) (actual time=9.713..9.714 rows=0.00 loops=1)
+  Buffers: shared hit=2354 dirtied=1
+  InitPlan 1
+    ->  Limit  (cost=4163.02..4163.02 rows=1 width=12) (actual time=9.496..9.496 rows=1.00 loops=1)
+          Buffers: shared hit=2291
+          ->  Sort  (cost=4163.02..4163.02 rows=3 width=12) (actual time=9.495..9.496 rows=1.00 loops=1)
+                Sort Key: orders_1.placed_at
+                Sort Method: top-N heapsort  Memory: 25kB
+                Buffers: shared hit=2291
+                ->  Seq Scan on orders orders_1  (cost=0.00..4163.00 rows=3 width=12) (actual time=9.471..9.486 rows=37.00 loops=1)
+                      Filter: ((partner_id IS NULL) AND (status = 'ACCEPTED'::text))
+                      Rows Removed by Filter: 149963
+                      Buffers: shared hit=2288
+  ->  Index Scan using orders_pkey on orders  (cost=0.42..8.44 rows=1 width=42) (actual time=9.506..9.508 rows=1.00 loops=1)
+        Index Cond: (order_id = (InitPlan 1).col1)
+        Index Searches: 1
+        Buffers: shared hit=2297
+Planning:
+  Buffers: shared hit=99
+Planning Time: 0.157 ms
+Trigger for constraint orders_partner_id_fkey: time=0.251 calls=1
+Execution Time: 10.008 ms
+=== W02 run 3 ===
+Update on orders  (cost=4163.44..4171.45 rows=0 width=0) (actual time=9.821..9.821 rows=0.00 loops=1)
+  Buffers: shared hit=2354
+  InitPlan 1
+    ->  Limit  (cost=4163.02..4163.02 rows=1 width=12) (actual time=9.640..9.640 rows=1.00 loops=1)
+          Buffers: shared hit=2291
+          ->  Sort  (cost=4163.02..4163.02 rows=3 width=12) (actual time=9.639..9.639 rows=1.00 loops=1)
+                Sort Key: orders_1.placed_at
+                Sort Method: top-N heapsort  Memory: 25kB
+                Buffers: shared hit=2291
+                ->  Seq Scan on orders orders_1  (cost=0.00..4163.00 rows=3 width=12) (actual time=9.616..9.631 rows=37.00 loops=1)
+                      Filter: ((partner_id IS NULL) AND (status = 'ACCEPTED'::text))
+                      Rows Removed by Filter: 149963
+                      Buffers: shared hit=2288
+  ->  Index Scan using orders_pkey on orders  (cost=0.42..8.44 rows=1 width=42) (actual time=9.647..9.649 rows=1.00 loops=1)
+        Index Cond: (order_id = (InitPlan 1).col1)
+        Index Searches: 1
+        Buffers: shared hit=2297
+Planning:
+  Buffers: shared hit=99
+Planning Time: 0.152 ms
+Trigger for constraint orders_partner_id_fkey: time=0.211 calls=1
+Execution Time: 10.075 ms
