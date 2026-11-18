@@ -369,3 +369,120 @@ WHERE o.status = 'DELIVERED'
   AND EXTRACT(YEAR FROM o.placed_at) = 2026
 GROUP BY l.city_id, ci.city_name, date_trunc('month', o.placed_at)
 ORDER BY l.city_id, month;
+
+
+-- =====================================================================
+-- PART 3: APPLICATION WRITE & TRANSACTIONAL WORKLOAD (WRITE W1 - W13)
+-- =====================================================================
+
+-- @W1
+-- WRITE: Customer checkout: Place a new order header row
+INSERT INTO orders (
+    order_id, customer_id, restaurant_id, coupon_code, placed_at,
+    distance_km, item_total, delivery_fee, discount, total_amount, status
+) VALUES (
+    90000001, 1042, 217, NULL, '2026-07-01 13:05:00+05:30',
+    3.20, 540.00, 25.00, 0.00, 565.00, 'PLACED'
+);
+
+-- @W2
+-- WRITE: Customer checkout: Insert line items for placed order
+INSERT INTO order_items (order_id, item_id, quantity, unit_price)
+VALUES
+    (90000001, 22241, 2, 110.00),
+    (90000001, 22242, 1, 320.00);
+
+-- @W3
+-- WRITE: Payment gateway: Record initial payment attempt
+INSERT INTO payments (
+    payment_id, order_id, amount, method, payment_status, attempted_at
+) VALUES (
+    90000001, 90000001, 565.00, 'UPI', 'SUCCESS', '2026-07-01 13:06:12+05:30'
+);
+
+-- @W4
+-- WRITE: Payment gateway webhook: Update payment status to SUCCESS
+UPDATE payments
+SET payment_status = 'SUCCESS'
+WHERE order_id = 90000001
+  AND method = 'UPI';
+
+-- @W5
+-- WRITE: Restaurant partner app: Accept incoming order
+UPDATE orders
+SET status = 'ACCEPTED',
+    accepted_at = '2026-07-01 13:08:00+05:30'
+WHERE order_id = 90000001
+  AND status = 'PLACED';
+
+-- @W6
+-- WRITE: Restaurant partner app: Start food preparation
+UPDATE orders
+SET status = 'PREPARING'
+WHERE order_id = 90000001
+  AND status = 'ACCEPTED';
+
+-- @W7
+-- WRITE: Dispatch system: Assign nearest delivery partner to order
+UPDATE orders
+SET partner_id = 150
+WHERE order_id = 90000001
+  AND partner_id IS NULL
+  AND status IN ('ACCEPTED', 'PREPARING');
+
+-- @W8
+-- WRITE: Delivery partner app: Pick up order from restaurant
+UPDATE orders
+SET status = 'OUT_FOR_DELIVERY',
+    picked_up_at = '2026-07-01 13:25:00+05:30'
+WHERE order_id = 90000001
+  AND partner_id = 150
+  AND status = 'PREPARING';
+
+-- @W9
+-- WRITE: Delivery partner app: Mark order as successfully delivered
+UPDATE orders
+SET status = 'DELIVERED',
+    delivered_at = '2026-07-01 13:48:00+05:30'
+WHERE order_id = 90000001
+  AND partner_id = 150
+  AND status = 'OUT_FOR_DELIVERY';
+
+-- @W10
+-- WRITE: Customer app: Submit rating and feedback review for delivered order
+INSERT INTO reviews (
+    review_id, order_id, customer_id, restaurant_id,
+    food_rating, delivery_rating, review_text, created_at
+) VALUES (
+    90000001, 90000001, 1042, 217,
+    5, 5, 'Food arrived hot and fresh, excellent packaging and quick delivery!',
+    '2026-07-01 14:10:00+05:30'
+);
+
+-- @W11
+-- WRITE: Restaurant partner app: Toggle menu item availability (sold out)
+UPDATE menu_items
+SET is_available = false
+WHERE restaurant_id = 217
+  AND category = 'Desserts';
+
+-- @W12
+-- WRITE: Nightly batch job: Recompute restaurant average ratings and rating count
+UPDATE restaurants r
+SET rating = agg.avg_rating,
+    rating_count = agg.review_count
+FROM (
+    SELECT restaurant_id,
+           ROUND(AVG(food_rating), 1) AS avg_rating,
+           COUNT(*) AS review_count
+    FROM reviews
+    GROUP BY restaurant_id
+) agg
+WHERE agg.restaurant_id = r.restaurant_id;
+
+-- @W13
+-- WRITE: Nightly batch job: Expire Gold memberships past validity date
+UPDATE customers
+SET is_gold_member = false
+WHERE is_gold_member = true
+  AND gold_expires_on < '2026-07-01';
