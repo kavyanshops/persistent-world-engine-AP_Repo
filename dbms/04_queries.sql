@@ -155,3 +155,217 @@ JOIN customers c ON c.customer_id = rv.customer_id
 WHERE rv.restaurant_id = 217
 ORDER BY rv.created_at DESC
 LIMIT 20;
+
+
+-- =====================================================================
+-- PART 2: RESTAURANT PARTNER, FLEET & OPERATIONS ANALYTICS (READ R13 - R28)
+-- =====================================================================
+
+-- @R13
+-- READ: Restaurant partner app: Active pending kitchen orders
+SELECT o.order_id, o.status, o.placed_at, o.accepted_at,
+       c.full_name AS customer_name, o.item_total, o.total_amount
+FROM orders o
+JOIN customers c ON c.customer_id = o.customer_id
+WHERE o.restaurant_id = 217
+  AND o.status IN ('PLACED', 'ACCEPTED', 'PREPARING')
+ORDER BY o.placed_at ASC;
+
+-- @R14
+-- READ: Restaurant partner app: Daily orders received and sales revenue
+SELECT o.order_id, o.status, o.item_total, o.delivery_fee,
+       o.discount, o.total_amount, o.placed_at
+FROM orders o
+WHERE o.restaurant_id = 217
+  AND DATE(o.placed_at) = '2026-06-15'
+ORDER BY o.placed_at ASC;
+
+-- @R15
+-- READ: Restaurant partner app: Monthly units sold and sales revenue per dish
+SELECT m.item_id, m.item_name, m.category,
+       SUM(oi.quantity) AS units_sold,
+       SUM(oi.quantity * oi.unit_price) AS total_sales
+FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN menu_items m ON m.item_id = oi.item_id
+WHERE o.restaurant_id = 217
+  AND o.status = 'DELIVERED'
+  AND o.placed_at >= '2026-05-01'
+  AND o.placed_at < '2026-06-01'
+GROUP BY m.item_id, m.item_name, m.category
+ORDER BY units_sold DESC;
+
+-- @R16
+-- READ: Restaurant partner app: Bestseller dishes ranking across Pune restaurants
+SELECT *
+FROM (
+    SELECT o.restaurant_id, r.name AS restaurant_name, oi.item_id, m.item_name,
+           SUM(oi.quantity) AS units,
+           RANK() OVER (PARTITION BY o.restaurant_id ORDER BY SUM(oi.quantity) DESC) AS rnk
+    FROM orders o
+    JOIN order_items oi ON oi.order_id = o.order_id
+    JOIN menu_items m ON m.item_id = oi.item_id
+    JOIN restaurants r ON r.restaurant_id = o.restaurant_id
+    JOIN localities l ON l.locality_id = r.locality_id
+    WHERE l.city_id = 6
+      AND o.status = 'DELIVERED'
+      AND o.placed_at >= '2026-06-01'
+    GROUP BY o.restaurant_id, r.name, oi.item_id, m.item_name
+) ranked_items
+WHERE rnk <= 3
+ORDER BY restaurant_id, rnk;
+
+-- @R17
+-- READ: Restaurant partner app: Performance metrics and customer satisfaction breakdown
+SELECT r.restaurant_id, r.name AS restaurant_name, r.rating, r.rating_count,
+       COUNT(rv.review_id) AS total_reviews,
+       ROUND(AVG(rv.food_rating), 2) AS avg_food_rating,
+       ROUND(AVG(rv.delivery_rating), 2) AS avg_delivery_rating
+FROM restaurants r
+LEFT JOIN reviews rv ON rv.restaurant_id = r.restaurant_id
+WHERE r.restaurant_id = 217
+GROUP BY r.restaurant_id, r.name, r.rating, r.rating_count;
+
+-- @R18
+-- READ: Delivery partner app: Available unassigned orders in city for pickup
+SELECT o.order_id, o.restaurant_id, r.name AS restaurant_name,
+       l.locality_name AS restaurant_locality, o.status, o.placed_at,
+       o.distance_km, o.delivery_fee
+FROM orders o
+JOIN restaurants r ON r.restaurant_id = o.restaurant_id
+JOIN localities l ON l.locality_id = r.locality_id
+WHERE l.city_id = 1
+  AND o.partner_id IS NULL
+  AND o.status IN ('PLACED', 'ACCEPTED')
+ORDER BY o.placed_at ASC
+LIMIT 20;
+
+-- @R19
+-- READ: Delivery partner app: Active delivery route and order destination
+SELECT o.order_id, o.status, o.placed_at, o.accepted_at, o.picked_up_at,
+       r.name AS restaurant_name, rl.locality_name AS pickup_locality,
+       c.full_name AS customer_name, c.phone AS customer_phone,
+       o.distance_km, o.delivery_fee
+FROM orders o
+JOIN restaurants r ON r.restaurant_id = o.restaurant_id
+JOIN localities rl ON rl.locality_id = r.locality_id
+JOIN customers c ON c.customer_id = o.customer_id
+WHERE o.partner_id = 150
+  AND o.status IN ('ACCEPTED', 'PREPARING', 'OUT_FOR_DELIVERY')
+ORDER BY o.placed_at DESC
+LIMIT 1;
+
+-- @R20
+-- READ: Delivery partner app: Weekly earnings and completed delivery count
+SELECT count(*) AS total_deliveries,
+       COALESCE(SUM(delivery_fee), 0.00) AS total_fees_earned,
+       ROUND(AVG(delivery_fee), 2) AS avg_fee_per_delivery
+FROM orders
+WHERE partner_id = 150
+  AND status = 'DELIVERED'
+  AND placed_at >= '2026-06-22'
+  AND placed_at < '2026-06-29';
+
+-- @R21
+-- READ: Dispatch operations: Unassigned orders waiting for partner pickup, oldest first
+SELECT o.order_id, o.restaurant_id, r.name AS restaurant_name,
+       l.locality_name, o.status, o.placed_at
+FROM orders o
+JOIN restaurants r ON r.restaurant_id = o.restaurant_id
+JOIN localities l ON l.locality_id = r.locality_id
+WHERE o.partner_id IS NULL
+  AND o.status IN ('PLACED', 'ACCEPTED')
+ORDER BY o.placed_at ASC
+LIMIT 50;
+
+-- @R22
+-- READ: Kitchen delay alert: Orders in PREPARING for over 40 minutes SLA
+SELECT o.order_id, o.restaurant_id, r.name AS restaurant_name,
+       o.accepted_at, o.placed_at,
+       ROUND(EXTRACT(EPOCH FROM (TIMESTAMPTZ '2026-06-30 23:59:00+05:30' - o.accepted_at)) / 60) AS minutes_in_kitchen
+FROM orders o
+JOIN restaurants r ON r.restaurant_id = o.restaurant_id
+WHERE o.status = 'PREPARING'
+  AND o.accepted_at < TIMESTAMPTZ '2026-06-30 23:59:00+05:30' - interval '40 minutes'
+ORDER BY o.accepted_at ASC;
+
+-- @R23
+-- READ: Fleet operations: Active Bengaluru delivery partners with no recent assignments
+SELECT p.partner_id, p.full_name, p.phone, p.vehicle_type, p.rating, ci.city_name
+FROM delivery_partners p
+JOIN cities ci ON ci.city_id = p.city_id
+WHERE p.city_id = 1
+  AND p.status = 'ACTIVE'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM orders o
+      WHERE o.partner_id = p.partner_id
+        AND o.placed_at >= '2026-06-25'
+  );
+
+-- @R24
+-- READ: Customer support: Orders where delivery exceeded 60 minutes SLA
+SELECT o.order_id, o.customer_id, c.full_name AS customer_name,
+       o.restaurant_id, r.name AS restaurant_name,
+       o.placed_at, o.delivered_at,
+       ROUND(EXTRACT(EPOCH FROM (o.delivered_at - o.placed_at)) / 60) AS duration_minutes
+FROM orders o
+JOIN customers c ON c.customer_id = o.customer_id
+JOIN restaurants r ON r.restaurant_id = o.restaurant_id
+WHERE o.status = 'DELIVERED'
+  AND o.delivered_at - o.placed_at > interval '60 minutes'
+  AND o.placed_at >= '2026-06-01'
+  AND o.placed_at < '2026-07-01'
+ORDER BY (o.delivered_at - o.placed_at) DESC
+LIMIT 100;
+
+-- @R25
+-- READ: Risk team: Customers with multiple failed payment attempts
+SELECT o.customer_id, c.full_name, c.phone, c.email,
+       COUNT(*) AS failed_attempts
+FROM payments p
+JOIN orders o ON o.order_id = p.order_id
+JOIN customers c ON c.customer_id = o.customer_id
+WHERE p.payment_status = 'FAILED'
+GROUP BY o.customer_id, c.full_name, c.phone, c.email
+HAVING COUNT(*) >= 2
+ORDER BY failed_attempts DESC, o.customer_id ASC;
+
+-- @R26
+-- READ: Payments team: Failed payment attempts breakdown by method in last 7 days
+SELECT method, count(*) AS failed_attempts
+FROM payments
+WHERE payment_status = 'FAILED'
+  AND attempted_at >= '2026-06-24'
+GROUP BY method
+ORDER BY failed_attempts DESC;
+
+-- @R27
+-- READ: Gold retention: Expiring Gold members who placed recent orders
+SELECT c.customer_id, c.full_name, c.email, c.phone, c.gold_expires_on, ci.city_name
+FROM customers c
+JOIN cities ci ON ci.city_id = c.city_id
+WHERE c.is_gold_member = true
+  AND c.gold_expires_on < '2026-07-01'
+  AND EXISTS (
+      SELECT 1
+      FROM orders o
+      WHERE o.customer_id = c.customer_id
+        AND o.placed_at >= '2026-06-01'
+        AND o.placed_at < '2026-07-01'
+  );
+
+-- @R28
+-- READ: Ops dashboard: Average delivery duration in minutes per city per month
+SELECT l.city_id, ci.city_name,
+       date_trunc('month', o.placed_at) AS month,
+       ROUND(AVG(EXTRACT(EPOCH FROM (o.delivered_at - o.placed_at)) / 60), 1) AS avg_delivery_minutes,
+       COUNT(*) AS total_delivered_orders
+FROM orders o
+JOIN restaurants r ON r.restaurant_id = o.restaurant_id
+JOIN localities l ON l.locality_id = r.locality_id
+JOIN cities ci ON ci.city_id = l.city_id
+WHERE o.status = 'DELIVERED'
+  AND EXTRACT(YEAR FROM o.placed_at) = 2026
+GROUP BY l.city_id, ci.city_name, date_trunc('month', o.placed_at)
+ORDER BY l.city_id, month;
