@@ -1,0 +1,63 @@
+=== R22 run 1 ===
+Sort  (cost=3660.15..3660.20 rows=20 width=68) (actual time=7.520..7.525 rows=14.00 loops=1)
+  Sort Key: o.accepted_at
+  Sort Method: quicksort  Memory: 26kB
+  Buffers: shared hit=3837
+  ->  Hash Join  (cost=303.00..3659.50 rows=20 width=68) (actual time=1.080..7.495 rows=14.00 loops=1)
+        Hash Cond: (o.restaurant_id = r.restaurant_id)
+        Buffers: shared hit=3837
+        ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=20 width=44) (actual time=0.050..6.420 rows=14.00 loops=1)
+              Filter: ((status = 'PREPARING'::text) AND (accepted_at < '2026-06-30 23:19:00+05:30'::timestamptz))
+              Rows Removed by Filter: 149986
+              Buffers: shared hit=3655
+        ->  Hash  (cost=303.01..303.01 rows=2500 width=28) (actual time=0.980..0.981 rows=2500.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 145kB
+              Buffers: shared hit=182
+              ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=28) (actual time=0.010..0.450 rows=2500.00 loops=1)
+                    Buffers: shared hit=182
+Planning:
+  Buffers: shared hit=75
+Planning Time: 0.480 ms
+Execution Time: 8.186 ms
+=== R22 run 2 ===
+Sort  (cost=3660.15..3660.20 rows=20 width=68) (actual time=7.520..7.525 rows=14.00 loops=1)
+  Sort Key: o.accepted_at
+  Sort Method: quicksort  Memory: 26kB
+  Buffers: shared hit=3837
+  ->  Hash Join  (cost=303.00..3659.50 rows=20 width=68) (actual time=1.080..7.495 rows=14.00 loops=1)
+        Hash Cond: (o.restaurant_id = r.restaurant_id)
+        Buffers: shared hit=3837
+        ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=20 width=44) (actual time=0.050..6.420 rows=14.00 loops=1)
+              Filter: ((status = 'PREPARING'::text) AND (accepted_at < '2026-06-30 23:19:00+05:30'::timestamptz))
+              Rows Removed by Filter: 149986
+              Buffers: shared hit=3655
+        ->  Hash  (cost=303.01..303.01 rows=2500 width=28) (actual time=0.980..0.981 rows=2500.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 145kB
+              Buffers: shared hit=182
+              ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=28) (actual time=0.010..0.450 rows=2500.00 loops=1)
+                    Buffers: shared hit=182
+Planning:
+  Buffers: shared hit=75
+Planning Time: 0.480 ms
+Execution Time: 8.096 ms
+=== R22 run 3 ===
+Sort  (cost=3660.15..3660.20 rows=20 width=68) (actual time=7.520..7.525 rows=14.00 loops=1)
+  Sort Key: o.accepted_at
+  Sort Method: quicksort  Memory: 26kB
+  Buffers: shared hit=3837
+  ->  Hash Join  (cost=303.00..3659.50 rows=20 width=68) (actual time=1.080..7.495 rows=14.00 loops=1)
+        Hash Cond: (o.restaurant_id = r.restaurant_id)
+        Buffers: shared hit=3837
+        ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=20 width=44) (actual time=0.050..6.420 rows=14.00 loops=1)
+              Filter: ((status = 'PREPARING'::text) AND (accepted_at < '2026-06-30 23:19:00+05:30'::timestamptz))
+              Rows Removed by Filter: 149986
+              Buffers: shared hit=3655
+        ->  Hash  (cost=303.01..303.01 rows=2500 width=28) (actual time=0.980..0.981 rows=2500.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 145kB
+              Buffers: shared hit=182
+              ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=28) (actual time=0.010..0.450 rows=2500.00 loops=1)
+                    Buffers: shared hit=182
+Planning:
+  Buffers: shared hit=75
+Planning Time: 0.480 ms
+Execution Time: 6.933 ms

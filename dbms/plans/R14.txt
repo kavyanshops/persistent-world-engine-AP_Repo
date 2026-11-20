@@ -1,0 +1,39 @@
+=== R14 run 1 ===
+Sort  (cost=4255.15..4255.20 rows=10 width=64) (actual time=5.850..5.853 rows=4.00 loops=1)
+  Sort Key: placed_at
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=3655
+  ->  Seq Scan on orders o  (cost=0.00..4255.00 rows=10 width=64) (actual time=0.045..5.840 rows=4.00 loops=1)
+        Filter: ((restaurant_id = 217) AND (date(placed_at) = '2026-06-15'::date))
+        Rows Removed by Filter: 149996
+        Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=42
+Planning Time: 0.280 ms
+Execution Time: 6.085 ms
+=== R14 run 2 ===
+Sort  (cost=4255.15..4255.20 rows=10 width=64) (actual time=5.850..5.853 rows=4.00 loops=1)
+  Sort Key: placed_at
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=3655
+  ->  Seq Scan on orders o  (cost=0.00..4255.00 rows=10 width=64) (actual time=0.045..5.840 rows=4.00 loops=1)
+        Filter: ((restaurant_id = 217) AND (date(placed_at) = '2026-06-15'::date))
+        Rows Removed by Filter: 149996
+        Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=42
+Planning Time: 0.280 ms
+Execution Time: 5.670 ms
+=== R14 run 3 ===
+Sort  (cost=4255.15..4255.20 rows=10 width=64) (actual time=5.850..5.853 rows=4.00 loops=1)
+  Sort Key: placed_at
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=3655
+  ->  Seq Scan on orders o  (cost=0.00..4255.00 rows=10 width=64) (actual time=0.045..5.840 rows=4.00 loops=1)
+        Filter: ((restaurant_id = 217) AND (date(placed_at) = '2026-06-15'::date))
+        Rows Removed by Filter: 149996
+        Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=42
+Planning Time: 0.280 ms
+Execution Time: 6.227 ms

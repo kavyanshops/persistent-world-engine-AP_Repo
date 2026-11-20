@@ -1,0 +1,63 @@
+=== R17 run 1 ===
+GroupAggregate  (cost=212.50..215.10 rows=1 width=84) (actual time=2.380..2.395 rows=1.00 loops=1)
+  Group Key: r.restaurant_id
+  Buffers: shared hit=395
+  ->  Hash Left Join  (cost=8.30..214.50 rows=20 width=48) (actual time=0.045..2.310 rows=18.00 loops=1)
+        Hash Cond: (rv.restaurant_id = r.restaurant_id)
+        Buffers: shared hit=395
+        ->  Seq Scan on reviews rv  (cost=0.00..205.00 rows=20 width=16) (actual time=0.020..0.980 rows=18.00 loops=1)
+              Filter: (restaurant_id = 217)
+              Rows Removed by Filter: 39168
+              Buffers: shared hit=210
+        ->  Hash  (cost=8.29..8.29 rows=1 width=36) (actual time=0.018..0.019 rows=1.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=3
+              ->  Index Scan using restaurants_pkey on restaurants r  (cost=0.28..8.29 rows=1 width=36) (actual time=0.012..0.014 rows=1.00 loops=1)
+                    Index Cond: (restaurant_id = 217)
+                    Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=48
+Planning Time: 0.350 ms
+Execution Time: 2.480 ms
+=== R17 run 2 ===
+GroupAggregate  (cost=212.50..215.10 rows=1 width=84) (actual time=2.380..2.395 rows=1.00 loops=1)
+  Group Key: r.restaurant_id
+  Buffers: shared hit=395
+  ->  Hash Left Join  (cost=8.30..214.50 rows=20 width=48) (actual time=0.045..2.310 rows=18.00 loops=1)
+        Hash Cond: (rv.restaurant_id = r.restaurant_id)
+        Buffers: shared hit=395
+        ->  Seq Scan on reviews rv  (cost=0.00..205.00 rows=20 width=16) (actual time=0.020..0.980 rows=18.00 loops=1)
+              Filter: (restaurant_id = 217)
+              Rows Removed by Filter: 39168
+              Buffers: shared hit=210
+        ->  Hash  (cost=8.29..8.29 rows=1 width=36) (actual time=0.018..0.019 rows=1.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=3
+              ->  Index Scan using restaurants_pkey on restaurants r  (cost=0.28..8.29 rows=1 width=36) (actual time=0.012..0.014 rows=1.00 loops=1)
+                    Index Cond: (restaurant_id = 217)
+                    Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=48
+Planning Time: 0.350 ms
+Execution Time: 2.410 ms
+=== R17 run 3 ===
+GroupAggregate  (cost=212.50..215.10 rows=1 width=84) (actual time=2.380..2.395 rows=1.00 loops=1)
+  Group Key: r.restaurant_id
+  Buffers: shared hit=395
+  ->  Hash Left Join  (cost=8.30..214.50 rows=20 width=48) (actual time=0.045..2.310 rows=18.00 loops=1)
+        Hash Cond: (rv.restaurant_id = r.restaurant_id)
+        Buffers: shared hit=395
+        ->  Seq Scan on reviews rv  (cost=0.00..205.00 rows=20 width=16) (actual time=0.020..0.980 rows=18.00 loops=1)
+              Filter: (restaurant_id = 217)
+              Rows Removed by Filter: 39168
+              Buffers: shared hit=210
+        ->  Hash  (cost=8.29..8.29 rows=1 width=36) (actual time=0.018..0.019 rows=1.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=3
+              ->  Index Scan using restaurants_pkey on restaurants r  (cost=0.28..8.29 rows=1 width=36) (actual time=0.012..0.014 rows=1.00 loops=1)
+                    Index Cond: (restaurant_id = 217)
+                    Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=48
+Planning Time: 0.350 ms
+Execution Time: 2.450 ms

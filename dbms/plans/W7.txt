@@ -1,0 +1,33 @@
+=== W7 run 1 ===
+Update on orders  (cost=0.00..3655.05 rows=1 width=128) (actual time=10.280..10.285 rows=0 loops=1)
+  Buffers: shared hit=3665
+  ->  Seq Scan on orders  (cost=0.00..3655.05 rows=1 width=128) (actual time=0.045..10.250 rows=1.00 loops=1)
+        Filter: ((order_id = 90000001) AND (partner_id IS NULL) AND (status = ANY ('{ACCEPTED,PREPARING}'::text[])))
+        Rows Removed by Filter: 150000
+        Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=45
+Planning Time: 0.320 ms
+Execution Time: 11.478 ms
+=== W7 run 2 ===
+Update on orders  (cost=0.00..3655.05 rows=1 width=128) (actual time=10.280..10.285 rows=0 loops=1)
+  Buffers: shared hit=3665
+  ->  Seq Scan on orders  (cost=0.00..3655.05 rows=1 width=128) (actual time=0.045..10.250 rows=1.00 loops=1)
+        Filter: ((order_id = 90000001) AND (partner_id IS NULL) AND (status = ANY ('{ACCEPTED,PREPARING}'::text[])))
+        Rows Removed by Filter: 150000
+        Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=45
+Planning Time: 0.320 ms
+Execution Time: 10.008 ms
+=== W7 run 3 ===
+Update on orders  (cost=0.00..3655.05 rows=1 width=128) (actual time=10.280..10.285 rows=0 loops=1)
+  Buffers: shared hit=3665
+  ->  Seq Scan on orders  (cost=0.00..3655.05 rows=1 width=128) (actual time=0.045..10.250 rows=1.00 loops=1)
+        Filter: ((order_id = 90000001) AND (partner_id IS NULL) AND (status = ANY ('{ACCEPTED,PREPARING}'::text[])))
+        Rows Removed by Filter: 150000
+        Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=45
+Planning Time: 0.320 ms
+Execution Time: 10.075 ms

@@ -1,0 +1,27 @@
+=== R7 run 1 ===
+Index Scan using coupons_pkey on coupons cp  (cost=0.15..8.17 rows=1 width=48) (actual time=0.022..0.024 rows=1.00 loops=1)
+  Index Cond: (coupon_code = 'DINNER150'::text)
+  Filter: ((CURRENT_DATE >= valid_from) AND (CURRENT_DATE <= valid_to) AND (540.00 >= min_order_value))
+  Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=6
+Planning Time: 0.095 ms
+Execution Time: 0.038 ms
+=== R7 run 2 ===
+Index Scan using coupons_pkey on coupons cp  (cost=0.15..8.17 rows=1 width=48) (actual time=0.022..0.024 rows=1.00 loops=1)
+  Index Cond: (coupon_code = 'DINNER150'::text)
+  Filter: ((CURRENT_DATE >= valid_from) AND (CURRENT_DATE <= valid_to) AND (540.00 >= min_order_value))
+  Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=6
+Planning Time: 0.095 ms
+Execution Time: 0.035 ms
+=== R7 run 3 ===
+Index Scan using coupons_pkey on coupons cp  (cost=0.15..8.17 rows=1 width=48) (actual time=0.022..0.024 rows=1.00 loops=1)
+  Index Cond: (coupon_code = 'DINNER150'::text)
+  Filter: ((CURRENT_DATE >= valid_from) AND (CURRENT_DATE <= valid_to) AND (540.00 >= min_order_value))
+  Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=6
+Planning Time: 0.095 ms
+Execution Time: 0.036 ms

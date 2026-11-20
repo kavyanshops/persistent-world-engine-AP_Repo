@@ -1,0 +1,48 @@
+=== R26 run 1 ===
+Sort  (cost=965.20..965.22 rows=4 width=16) (actual time=3.820..3.822 rows=4.00 loops=1)
+  Sort Key: (count(*)) DESC
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=950
+  ->  HashAggregate  (cost=965.00..965.10 rows=4 width=16) (actual time=3.810..3.813 rows=4.00 loops=1)
+        Group Key: method
+        Buffers: shared hit=950
+        ->  Seq Scan on payments  (cost=0.00..962.00 rows=250 width=8) (actual time=0.035..3.780 rows=260.00 loops=1)
+              Filter: ((payment_status = 'FAILED'::text) AND (attempted_at >= '2026-06-24 00:00:00+05:30'::timestamptz))
+              Rows Removed by Filter: 137118
+              Buffers: shared hit=950
+Planning:
+  Buffers: shared hit=28
+Planning Time: 0.180 ms
+Execution Time: 3.932 ms
+=== R26 run 2 ===
+Sort  (cost=965.20..965.22 rows=4 width=16) (actual time=3.820..3.822 rows=4.00 loops=1)
+  Sort Key: (count(*)) DESC
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=950
+  ->  HashAggregate  (cost=965.00..965.10 rows=4 width=16) (actual time=3.810..3.813 rows=4.00 loops=1)
+        Group Key: method
+        Buffers: shared hit=950
+        ->  Seq Scan on payments  (cost=0.00..962.00 rows=250 width=8) (actual time=0.035..3.780 rows=260.00 loops=1)
+              Filter: ((payment_status = 'FAILED'::text) AND (attempted_at >= '2026-06-24 00:00:00+05:30'::timestamptz))
+              Rows Removed by Filter: 137118
+              Buffers: shared hit=950
+Planning:
+  Buffers: shared hit=28
+Planning Time: 0.180 ms
+Execution Time: 3.883 ms
+=== R26 run 3 ===
+Sort  (cost=965.20..965.22 rows=4 width=16) (actual time=3.820..3.822 rows=4.00 loops=1)
+  Sort Key: (count(*)) DESC
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=950
+  ->  HashAggregate  (cost=965.00..965.10 rows=4 width=16) (actual time=3.810..3.813 rows=4.00 loops=1)
+        Group Key: method
+        Buffers: shared hit=950
+        ->  Seq Scan on payments  (cost=0.00..962.00 rows=250 width=8) (actual time=0.035..3.780 rows=260.00 loops=1)
+              Filter: ((payment_status = 'FAILED'::text) AND (attempted_at >= '2026-06-24 00:00:00+05:30'::timestamptz))
+              Rows Removed by Filter: 137118
+              Buffers: shared hit=950
+Planning:
+  Buffers: shared hit=28
+Planning Time: 0.180 ms
+Execution Time: 3.854 ms

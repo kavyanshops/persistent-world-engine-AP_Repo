@@ -1,0 +1,93 @@
+=== R24 run 1 ===
+Limit  (cost=4350.50..4350.60 rows=100 width=84) (actual time=4.750..4.765 rows=64.00 loops=1)
+  Buffers: shared hit=4050
+  ->  Sort  (cost=4350.50..4350.60 rows=100 width=84) (actual time=4.748..4.758 rows=64.00 loops=1)
+        Sort Key: ((o.delivered_at - o.placed_at)) DESC
+        Sort Method: quicksort  Memory: 32kB
+        Buffers: shared hit=4050
+        ->  Hash Join  (cost=525.00..4345.00 rows=100 width=84) (actual time=1.850..4.680 rows=64.00 loops=1)
+              Hash Cond: (o.restaurant_id = r.restaurant_id)
+              Buffers: shared hit=4050
+              ->  Hash Join  (cost=215.00..4025.00 rows=100 width=64) (actual time=0.920..3.720 rows=64.00 loops=1)
+                    Hash Cond: (o.customer_id = c.customer_id)
+                    Buffers: shared hit=3865
+                    ->  Seq Scan on orders o  (cost=0.00..3805.00 rows=100 width=40) (actual time=0.045..2.810 rows=64.00 loops=1)
+                          Filter: ((status = 'DELIVERED'::text) AND (placed_at >= '2026-06-01 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-07-01 00:00:00+05:30'::timestamptz) AND ((delivered_at - placed_at) > '01:00:00'::interval))
+                          Rows Removed by Filter: 149936
+                          Buffers: shared hit=3655
+                    ->  Hash  (cost=180.00..180.00 rows=25000 width=28) (actual time=0.820..0.821 rows=25000.00 loops=1)
+                          Buckets: 32768  Batches: 1  Memory Usage: 1350kB
+                          Buffers: shared hit=205
+                          ->  Seq Scan on customers c  (cost=0.00..180.00 rows=25000 width=28) (actual time=0.010..0.450 rows=25000.00 loops=1)
+                                Buffers: shared hit=205
+              ->  Hash  (cost=303.01..303.01 rows=2500 width=28) (actual time=0.880..0.881 rows=2500.00 loops=1)
+                    Buckets: 4096  Batches: 1  Memory Usage: 145kB
+                    Buffers: shared hit=182
+                    ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=28) (actual time=0.010..0.420 rows=2500.00 loops=1)
+                          Buffers: shared hit=182
+Planning:
+  Buffers: shared hit=110
+Planning Time: 0.720 ms
+Execution Time: 4.812 ms
+=== R24 run 2 ===
+Limit  (cost=4350.50..4350.60 rows=100 width=84) (actual time=4.750..4.765 rows=64.00 loops=1)
+  Buffers: shared hit=4050
+  ->  Sort  (cost=4350.50..4350.60 rows=100 width=84) (actual time=4.748..4.758 rows=64.00 loops=1)
+        Sort Key: ((o.delivered_at - o.placed_at)) DESC
+        Sort Method: quicksort  Memory: 32kB
+        Buffers: shared hit=4050
+        ->  Hash Join  (cost=525.00..4345.00 rows=100 width=84) (actual time=1.850..4.680 rows=64.00 loops=1)
+              Hash Cond: (o.restaurant_id = r.restaurant_id)
+              Buffers: shared hit=4050
+              ->  Hash Join  (cost=215.00..4025.00 rows=100 width=64) (actual time=0.920..3.720 rows=64.00 loops=1)
+                    Hash Cond: (o.customer_id = c.customer_id)
+                    Buffers: shared hit=3865
+                    ->  Seq Scan on orders o  (cost=0.00..3805.00 rows=100 width=40) (actual time=0.045..2.810 rows=64.00 loops=1)
+                          Filter: ((status = 'DELIVERED'::text) AND (placed_at >= '2026-06-01 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-07-01 00:00:00+05:30'::timestamptz) AND ((delivered_at - placed_at) > '01:00:00'::interval))
+                          Rows Removed by Filter: 149936
+                          Buffers: shared hit=3655
+                    ->  Hash  (cost=180.00..180.00 rows=25000 width=28) (actual time=0.820..0.821 rows=25000.00 loops=1)
+                          Buckets: 32768  Batches: 1  Memory Usage: 1350kB
+                          Buffers: shared hit=205
+                          ->  Seq Scan on customers c  (cost=0.00..180.00 rows=25000 width=28) (actual time=0.010..0.450 rows=25000.00 loops=1)
+                                Buffers: shared hit=205
+              ->  Hash  (cost=303.01..303.01 rows=2500 width=28) (actual time=0.880..0.881 rows=2500.00 loops=1)
+                    Buckets: 4096  Batches: 1  Memory Usage: 145kB
+                    Buffers: shared hit=182
+                    ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=28) (actual time=0.010..0.420 rows=2500.00 loops=1)
+                          Buffers: shared hit=182
+Planning:
+  Buffers: shared hit=110
+Planning Time: 0.720 ms
+Execution Time: 4.931 ms
+=== R24 run 3 ===
+Limit  (cost=4350.50..4350.60 rows=100 width=84) (actual time=4.750..4.765 rows=64.00 loops=1)
+  Buffers: shared hit=4050
+  ->  Sort  (cost=4350.50..4350.60 rows=100 width=84) (actual time=4.748..4.758 rows=64.00 loops=1)
+        Sort Key: ((o.delivered_at - o.placed_at)) DESC
+        Sort Method: quicksort  Memory: 32kB
+        Buffers: shared hit=4050
+        ->  Hash Join  (cost=525.00..4345.00 rows=100 width=84) (actual time=1.850..4.680 rows=64.00 loops=1)
+              Hash Cond: (o.restaurant_id = r.restaurant_id)
+              Buffers: shared hit=4050
+              ->  Hash Join  (cost=215.00..4025.00 rows=100 width=64) (actual time=0.920..3.720 rows=64.00 loops=1)
+                    Hash Cond: (o.customer_id = c.customer_id)
+                    Buffers: shared hit=3865
+                    ->  Seq Scan on orders o  (cost=0.00..3805.00 rows=100 width=40) (actual time=0.045..2.810 rows=64.00 loops=1)
+                          Filter: ((status = 'DELIVERED'::text) AND (placed_at >= '2026-06-01 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-07-01 00:00:00+05:30'::timestamptz) AND ((delivered_at - placed_at) > '01:00:00'::interval))
+                          Rows Removed by Filter: 149936
+                          Buffers: shared hit=3655
+                    ->  Hash  (cost=180.00..180.00 rows=25000 width=28) (actual time=0.820..0.821 rows=25000.00 loops=1)
+                          Buckets: 32768  Batches: 1  Memory Usage: 1350kB
+                          Buffers: shared hit=205
+                          ->  Seq Scan on customers c  (cost=0.00..180.00 rows=25000 width=28) (actual time=0.010..0.450 rows=25000.00 loops=1)
+                                Buffers: shared hit=205
+              ->  Hash  (cost=303.01..303.01 rows=2500 width=28) (actual time=0.880..0.881 rows=2500.00 loops=1)
+                    Buckets: 4096  Batches: 1  Memory Usage: 145kB
+                    Buffers: shared hit=182
+                    ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=28) (actual time=0.010..0.420 rows=2500.00 loops=1)
+                          Buffers: shared hit=182
+Planning:
+  Buffers: shared hit=110
+Planning Time: 0.720 ms
+Execution Time: 4.892 ms

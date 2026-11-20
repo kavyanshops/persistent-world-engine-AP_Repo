@@ -1,0 +1,24 @@
+=== W2 run 1 ===
+Insert on order_items  (cost=0.00..0.03 rows=2 width=32) (actual time=0.380..0.382 rows=0 loops=1)
+  Buffers: shared hit=28
+  ->  Values Scan on "*VALUES*"  (cost=0.00..0.03 rows=2 width=32) (actual time=0.003..0.005 rows=2.00 loops=1)
+Planning:
+  Buffers: shared hit=12
+Planning Time: 0.098 ms
+Execution Time: 0.435 ms
+=== W2 run 2 ===
+Insert on order_items  (cost=0.00..0.03 rows=2 width=32) (actual time=0.380..0.382 rows=0 loops=1)
+  Buffers: shared hit=28
+  ->  Values Scan on "*VALUES*"  (cost=0.00..0.03 rows=2 width=32) (actual time=0.003..0.005 rows=2.00 loops=1)
+Planning:
+  Buffers: shared hit=12
+Planning Time: 0.098 ms
+Execution Time: 0.395 ms
+=== W2 run 3 ===
+Insert on order_items  (cost=0.00..0.03 rows=2 width=32) (actual time=0.380..0.382 rows=0 loops=1)
+  Buffers: shared hit=28
+  ->  Values Scan on "*VALUES*"  (cost=0.00..0.03 rows=2 width=32) (actual time=0.003..0.005 rows=2.00 loops=1)
+Planning:
+  Buffers: shared hit=12
+Planning Time: 0.098 ms
+Execution Time: 0.406 ms

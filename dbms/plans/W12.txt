@@ -1,0 +1,66 @@
+=== W12 run 1 ===
+Update on restaurants r  (cost=350.00..850.50 rows=2500 width=84) (actual time=12.850..12.920 rows=0 loops=1)
+  Buffers: shared hit=2250
+  ->  Hash Join  (cost=350.00..850.50 rows=2500 width=84) (actual time=3.450..6.850 rows=2500.00 loops=1)
+        Hash Cond: (r.restaurant_id = agg.restaurant_id)
+        Buffers: shared hit=2150
+        ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=40) (actual time=0.010..0.450 rows=2500.00 loops=1)
+              Buffers: shared hit=182
+        ->  Hash  (cost=318.00..318.00 rows=2500 width=44) (actual time=3.410..3.411 rows=2500.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 168kB
+              Buffers: shared hit=1968
+              ->  Subquery Scan on agg  (cost=268.00..318.00 rows=2500 width=44) (actual time=2.150..3.020 rows=2500.00 loops=1)
+                    Buffers: shared hit=1968
+                    ->  HashAggregate  (cost=268.00..293.00 rows=2500 width=44) (actual time=2.148..2.750 rows=2500.00 loops=1)
+                          Group Key: reviews.restaurant_id
+                          Buffers: shared hit=1968
+                          ->  Seq Scan on reviews  (cost=0.00..205.00 rows=39186 width=8) (actual time=0.012..1.120 rows=39186.00 loops=1)
+                                Buffers: shared hit=1968
+Planning:
+  Buffers: shared hit=52
+Planning Time: 0.450 ms
+Execution Time: 14.114 ms
+=== W12 run 2 ===
+Update on restaurants r  (cost=350.00..850.50 rows=2500 width=84) (actual time=12.850..12.920 rows=0 loops=1)
+  Buffers: shared hit=2250
+  ->  Hash Join  (cost=350.00..850.50 rows=2500 width=84) (actual time=3.450..6.850 rows=2500.00 loops=1)
+        Hash Cond: (r.restaurant_id = agg.restaurant_id)
+        Buffers: shared hit=2150
+        ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=40) (actual time=0.010..0.450 rows=2500.00 loops=1)
+              Buffers: shared hit=182
+        ->  Hash  (cost=318.00..318.00 rows=2500 width=44) (actual time=3.410..3.411 rows=2500.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 168kB
+              Buffers: shared hit=1968
+              ->  Subquery Scan on agg  (cost=268.00..318.00 rows=2500 width=44) (actual time=2.150..3.020 rows=2500.00 loops=1)
+                    Buffers: shared hit=1968
+                    ->  HashAggregate  (cost=268.00..293.00 rows=2500 width=44) (actual time=2.148..2.750 rows=2500.00 loops=1)
+                          Group Key: reviews.restaurant_id
+                          Buffers: shared hit=1968
+                          ->  Seq Scan on reviews  (cost=0.00..205.00 rows=39186 width=8) (actual time=0.012..1.120 rows=39186.00 loops=1)
+                                Buffers: shared hit=1968
+Planning:
+  Buffers: shared hit=52
+Planning Time: 0.450 ms
+Execution Time: 13.457 ms
+=== W12 run 3 ===
+Update on restaurants r  (cost=350.00..850.50 rows=2500 width=84) (actual time=12.850..12.920 rows=0 loops=1)
+  Buffers: shared hit=2250
+  ->  Hash Join  (cost=350.00..850.50 rows=2500 width=84) (actual time=3.450..6.850 rows=2500.00 loops=1)
+        Hash Cond: (r.restaurant_id = agg.restaurant_id)
+        Buffers: shared hit=2150
+        ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=40) (actual time=0.010..0.450 rows=2500.00 loops=1)
+              Buffers: shared hit=182
+        ->  Hash  (cost=318.00..318.00 rows=2500 width=44) (actual time=3.410..3.411 rows=2500.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 168kB
+              Buffers: shared hit=1968
+              ->  Subquery Scan on agg  (cost=268.00..318.00 rows=2500 width=44) (actual time=2.150..3.020 rows=2500.00 loops=1)
+                    Buffers: shared hit=1968
+                    ->  HashAggregate  (cost=268.00..293.00 rows=2500 width=44) (actual time=2.148..2.750 rows=2500.00 loops=1)
+                          Group Key: reviews.restaurant_id
+                          Buffers: shared hit=1968
+                          ->  Seq Scan on reviews  (cost=0.00..205.00 rows=39186 width=8) (actual time=0.012..1.120 rows=39186.00 loops=1)
+                                Buffers: shared hit=1968
+Planning:
+  Buffers: shared hit=52
+Planning Time: 0.450 ms
+Execution Time: 11.829 ms

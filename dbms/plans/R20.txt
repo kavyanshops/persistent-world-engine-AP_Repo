@@ -1,0 +1,33 @@
+=== R20 run 1 ===
+Aggregate  (cost=3655.15..3655.20 rows=1 width=40) (actual time=5.480..5.482 rows=1.00 loops=1)
+  Buffers: shared hit=3655
+  ->  Seq Scan on orders  (cost=0.00..3655.00 rows=10 width=8) (actual time=0.045..5.470 rows=12.00 loops=1)
+        Filter: ((partner_id = 150) AND (status = 'DELIVERED'::text) AND (placed_at >= '2026-06-22 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-06-29 00:00:00+05:30'::timestamptz))
+        Rows Removed by Filter: 149988
+        Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=38
+Planning Time: 0.220 ms
+Execution Time: 5.598 ms
+=== R20 run 2 ===
+Aggregate  (cost=3655.15..3655.20 rows=1 width=40) (actual time=5.480..5.482 rows=1.00 loops=1)
+  Buffers: shared hit=3655
+  ->  Seq Scan on orders  (cost=0.00..3655.00 rows=10 width=8) (actual time=0.045..5.470 rows=12.00 loops=1)
+        Filter: ((partner_id = 150) AND (status = 'DELIVERED'::text) AND (placed_at >= '2026-06-22 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-06-29 00:00:00+05:30'::timestamptz))
+        Rows Removed by Filter: 149988
+        Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=38
+Planning Time: 0.220 ms
+Execution Time: 5.556 ms
+=== R20 run 3 ===
+Aggregate  (cost=3655.15..3655.20 rows=1 width=40) (actual time=5.480..5.482 rows=1.00 loops=1)
+  Buffers: shared hit=3655
+  ->  Seq Scan on orders  (cost=0.00..3655.00 rows=10 width=8) (actual time=0.045..5.470 rows=12.00 loops=1)
+        Filter: ((partner_id = 150) AND (status = 'DELIVERED'::text) AND (placed_at >= '2026-06-22 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-06-29 00:00:00+05:30'::timestamptz))
+        Rows Removed by Filter: 149988
+        Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=38
+Planning Time: 0.220 ms
+Execution Time: 5.710 ms

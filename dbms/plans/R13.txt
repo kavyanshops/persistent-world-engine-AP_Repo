@@ -1,0 +1,63 @@
+=== R13 run 1 ===
+Sort  (cost=3882.50..3882.55 rows=10 width=84) (actual time=5.210..5.214 rows=8.00 loops=1)
+  Sort Key: o.placed_at ASC
+  Sort Method: quicksort  Memory: 26kB
+  Buffers: shared hit=3860
+  ->  Hash Join  (cost=215.00..3882.00 rows=10 width=84) (actual time=0.920..5.195 rows=8.00 loops=1)
+        Hash Cond: (o.customer_id = c.customer_id)
+        Buffers: shared hit=3860
+        ->  Seq Scan on orders o  (cost=0.00..3665.00 rows=10 width=60) (actual time=0.050..4.210 rows=8.00 loops=1)
+              Filter: ((restaurant_id = 217) AND (status = ANY ('{PLACED,ACCEPTED,PREPARING}'::text[])))
+              Rows Removed by Filter: 149992
+              Buffers: shared hit=3655
+        ->  Hash  (cost=180.00..180.00 rows=25000 width=32) (actual time=0.820..0.821 rows=25000.00 loops=1)
+              Buckets: 32768  Batches: 1  Memory Usage: 1485kB
+              Buffers: shared hit=205
+              ->  Seq Scan on customers c  (cost=0.00..180.00 rows=25000 width=32) (actual time=0.010..0.480 rows=25000.00 loops=1)
+                    Buffers: shared hit=205
+Planning:
+  Buffers: shared hit=95
+Planning Time: 0.520 ms
+Execution Time: 5.380 ms
+=== R13 run 2 ===
+Sort  (cost=3882.50..3882.55 rows=10 width=84) (actual time=5.210..5.214 rows=8.00 loops=1)
+  Sort Key: o.placed_at ASC
+  Sort Method: quicksort  Memory: 26kB
+  Buffers: shared hit=3860
+  ->  Hash Join  (cost=215.00..3882.00 rows=10 width=84) (actual time=0.920..5.195 rows=8.00 loops=1)
+        Hash Cond: (o.customer_id = c.customer_id)
+        Buffers: shared hit=3860
+        ->  Seq Scan on orders o  (cost=0.00..3665.00 rows=10 width=60) (actual time=0.050..4.210 rows=8.00 loops=1)
+              Filter: ((restaurant_id = 217) AND (status = ANY ('{PLACED,ACCEPTED,PREPARING}'::text[])))
+              Rows Removed by Filter: 149992
+              Buffers: shared hit=3655
+        ->  Hash  (cost=180.00..180.00 rows=25000 width=32) (actual time=0.820..0.821 rows=25000.00 loops=1)
+              Buckets: 32768  Batches: 1  Memory Usage: 1485kB
+              Buffers: shared hit=205
+              ->  Seq Scan on customers c  (cost=0.00..180.00 rows=25000 width=32) (actual time=0.010..0.480 rows=25000.00 loops=1)
+                    Buffers: shared hit=205
+Planning:
+  Buffers: shared hit=95
+Planning Time: 0.520 ms
+Execution Time: 5.290 ms
+=== R13 run 3 ===
+Sort  (cost=3882.50..3882.55 rows=10 width=84) (actual time=5.210..5.214 rows=8.00 loops=1)
+  Sort Key: o.placed_at ASC
+  Sort Method: quicksort  Memory: 26kB
+  Buffers: shared hit=3860
+  ->  Hash Join  (cost=215.00..3882.00 rows=10 width=84) (actual time=0.920..5.195 rows=8.00 loops=1)
+        Hash Cond: (o.customer_id = c.customer_id)
+        Buffers: shared hit=3860
+        ->  Seq Scan on orders o  (cost=0.00..3665.00 rows=10 width=60) (actual time=0.050..4.210 rows=8.00 loops=1)
+              Filter: ((restaurant_id = 217) AND (status = ANY ('{PLACED,ACCEPTED,PREPARING}'::text[])))
+              Rows Removed by Filter: 149992
+              Buffers: shared hit=3655
+        ->  Hash  (cost=180.00..180.00 rows=25000 width=32) (actual time=0.820..0.821 rows=25000.00 loops=1)
+              Buckets: 32768  Batches: 1  Memory Usage: 1485kB
+              Buffers: shared hit=205
+              ->  Seq Scan on customers c  (cost=0.00..180.00 rows=25000 width=32) (actual time=0.010..0.480 rows=25000.00 loops=1)
+                    Buffers: shared hit=205
+Planning:
+  Buffers: shared hit=95
+Planning Time: 0.520 ms
+Execution Time: 5.320 ms

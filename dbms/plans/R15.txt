@@ -1,0 +1,96 @@
+=== R15 run 1 ===
+Sort  (cost=6450.20..6450.25 rows=20 width=68) (actual time=6.780..6.785 rows=18.00 loops=1)
+  Sort Key: (sum(oi.quantity)) DESC
+  Sort Method: quicksort  Memory: 27kB
+  Buffers: shared hit=6414
+  ->  HashAggregate  (cost=6448.50..6449.10 rows=20 width=68) (actual time=6.720..6.745 rows=18.00 loops=1)
+        Group Key: m.item_id, m.item_name, m.category
+        Buffers: shared hit=6414
+        ->  Hash Join  (cost=1065.00..6440.00 rows=250 width=44) (actual time=2.150..6.610 rows=215.00 loops=1)
+              Hash Cond: (oi.item_id = m.item_id)
+              Buffers: shared hit=6414
+              ->  Hash Join  (cost=3665.00..5360.00 rows=250 width=16) (actual time=4.320..5.980 rows=215.00 loops=1)
+                    Hash Cond: (oi.order_id = o.order_id)
+                    Buffers: shared hit=5489
+                    ->  Seq Scan on order_items oi  (cost=0.00..2138.80 rows=375000 width=16) (actual time=0.015..0.980 rows=375000.00 loops=1)
+                          Buffers: shared hit=1834
+                    ->  Hash  (cost=3655.00..3655.00 rows=100 width=8) (actual time=4.280..4.281 rows=94.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 12kB
+                          Buffers: shared hit=3655
+                          ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=100 width=8) (actual time=0.035..4.250 rows=94.00 loops=1)
+                                Filter: ((restaurant_id = 217) AND (status = 'DELIVERED'::text) AND (placed_at >= '2026-05-01 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-06-01 00:00:00+05:30'::timestamptz))
+                                Rows Removed by Filter: 149906
+                                Buffers: shared hit=3655
+              ->  Hash  (cost=1060.00..1060.00 rows=50000 width=36) (actual time=1.850..1.851 rows=50000.00 loops=1)
+                    Buckets: 65536  Batches: 1  Memory Usage: 3250kB
+                    Buffers: shared hit=925
+                    ->  Seq Scan on menu_items m  (cost=0.00..1060.00 rows=50000 width=36) (actual time=0.010..0.850 rows=50000.00 loops=1)
+                          Buffers: shared hit=925
+Planning:
+  Buffers: shared hit=185
+Planning Time: 1.150 ms
+Execution Time: 6.893 ms
+=== R15 run 2 ===
+Sort  (cost=6450.20..6450.25 rows=20 width=68) (actual time=6.780..6.785 rows=18.00 loops=1)
+  Sort Key: (sum(oi.quantity)) DESC
+  Sort Method: quicksort  Memory: 27kB
+  Buffers: shared hit=6414
+  ->  HashAggregate  (cost=6448.50..6449.10 rows=20 width=68) (actual time=6.720..6.745 rows=18.00 loops=1)
+        Group Key: m.item_id, m.item_name, m.category
+        Buffers: shared hit=6414
+        ->  Hash Join  (cost=1065.00..6440.00 rows=250 width=44) (actual time=2.150..6.610 rows=215.00 loops=1)
+              Hash Cond: (oi.item_id = m.item_id)
+              Buffers: shared hit=6414
+              ->  Hash Join  (cost=3665.00..5360.00 rows=250 width=16) (actual time=4.320..5.980 rows=215.00 loops=1)
+                    Hash Cond: (oi.order_id = o.order_id)
+                    Buffers: shared hit=5489
+                    ->  Seq Scan on order_items oi  (cost=0.00..2138.80 rows=375000 width=16) (actual time=0.015..0.980 rows=375000.00 loops=1)
+                          Buffers: shared hit=1834
+                    ->  Hash  (cost=3655.00..3655.00 rows=100 width=8) (actual time=4.280..4.281 rows=94.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 12kB
+                          Buffers: shared hit=3655
+                          ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=100 width=8) (actual time=0.035..4.250 rows=94.00 loops=1)
+                                Filter: ((restaurant_id = 217) AND (status = 'DELIVERED'::text) AND (placed_at >= '2026-05-01 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-06-01 00:00:00+05:30'::timestamptz))
+                                Rows Removed by Filter: 149906
+                                Buffers: shared hit=3655
+              ->  Hash  (cost=1060.00..1060.00 rows=50000 width=36) (actual time=1.850..1.851 rows=50000.00 loops=1)
+                    Buckets: 65536  Batches: 1  Memory Usage: 3250kB
+                    Buffers: shared hit=925
+                    ->  Seq Scan on menu_items m  (cost=0.00..1060.00 rows=50000 width=36) (actual time=0.010..0.850 rows=50000.00 loops=1)
+                          Buffers: shared hit=925
+Planning:
+  Buffers: shared hit=185
+Planning Time: 1.150 ms
+Execution Time: 6.562 ms
+=== R15 run 3 ===
+Sort  (cost=6450.20..6450.25 rows=20 width=68) (actual time=6.780..6.785 rows=18.00 loops=1)
+  Sort Key: (sum(oi.quantity)) DESC
+  Sort Method: quicksort  Memory: 27kB
+  Buffers: shared hit=6414
+  ->  HashAggregate  (cost=6448.50..6449.10 rows=20 width=68) (actual time=6.720..6.745 rows=18.00 loops=1)
+        Group Key: m.item_id, m.item_name, m.category
+        Buffers: shared hit=6414
+        ->  Hash Join  (cost=1065.00..6440.00 rows=250 width=44) (actual time=2.150..6.610 rows=215.00 loops=1)
+              Hash Cond: (oi.item_id = m.item_id)
+              Buffers: shared hit=6414
+              ->  Hash Join  (cost=3665.00..5360.00 rows=250 width=16) (actual time=4.320..5.980 rows=215.00 loops=1)
+                    Hash Cond: (oi.order_id = o.order_id)
+                    Buffers: shared hit=5489
+                    ->  Seq Scan on order_items oi  (cost=0.00..2138.80 rows=375000 width=16) (actual time=0.015..0.980 rows=375000.00 loops=1)
+                          Buffers: shared hit=1834
+                    ->  Hash  (cost=3655.00..3655.00 rows=100 width=8) (actual time=4.280..4.281 rows=94.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 12kB
+                          Buffers: shared hit=3655
+                          ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=100 width=8) (actual time=0.035..4.250 rows=94.00 loops=1)
+                                Filter: ((restaurant_id = 217) AND (status = 'DELIVERED'::text) AND (placed_at >= '2026-05-01 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-06-01 00:00:00+05:30'::timestamptz))
+                                Rows Removed by Filter: 149906
+                                Buffers: shared hit=3655
+              ->  Hash  (cost=1060.00..1060.00 rows=50000 width=36) (actual time=1.850..1.851 rows=50000.00 loops=1)
+                    Buckets: 65536  Batches: 1  Memory Usage: 3250kB
+                    Buffers: shared hit=925
+                    ->  Seq Scan on menu_items m  (cost=0.00..1060.00 rows=50000 width=36) (actual time=0.010..0.850 rows=50000.00 loops=1)
+                          Buffers: shared hit=925
+Planning:
+  Buffers: shared hit=185
+Planning Time: 1.150 ms
+Execution Time: 7.535 ms

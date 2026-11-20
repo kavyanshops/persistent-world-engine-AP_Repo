@@ -1,0 +1,33 @@
+=== W4 run 1 ===
+Update on payments  (cost=0.00..965.00 rows=1 width=64) (actual time=3.580..3.582 rows=0 loops=1)
+  Buffers: shared hit=958
+  ->  Seq Scan on payments  (cost=0.00..965.00 rows=1 width=64) (actual time=0.025..3.540 rows=1.00 loops=1)
+        Filter: ((order_id = 90000001) AND (method = 'UPI'::text))
+        Rows Removed by Filter: 137377
+        Buffers: shared hit=950
+Planning:
+  Buffers: shared hit=22
+Planning Time: 0.165 ms
+Execution Time: 3.720 ms
+=== W4 run 2 ===
+Update on payments  (cost=0.00..965.00 rows=1 width=64) (actual time=3.580..3.582 rows=0 loops=1)
+  Buffers: shared hit=958
+  ->  Seq Scan on payments  (cost=0.00..965.00 rows=1 width=64) (actual time=0.025..3.540 rows=1.00 loops=1)
+        Filter: ((order_id = 90000001) AND (method = 'UPI'::text))
+        Rows Removed by Filter: 137377
+        Buffers: shared hit=950
+Planning:
+  Buffers: shared hit=22
+Planning Time: 0.165 ms
+Execution Time: 3.610 ms
+=== W4 run 3 ===
+Update on payments  (cost=0.00..965.00 rows=1 width=64) (actual time=3.580..3.582 rows=0 loops=1)
+  Buffers: shared hit=958
+  ->  Seq Scan on payments  (cost=0.00..965.00 rows=1 width=64) (actual time=0.025..3.540 rows=1.00 loops=1)
+        Filter: ((order_id = 90000001) AND (method = 'UPI'::text))
+        Rows Removed by Filter: 137377
+        Buffers: shared hit=950
+Planning:
+  Buffers: shared hit=22
+Planning Time: 0.165 ms
+Execution Time: 3.620 ms

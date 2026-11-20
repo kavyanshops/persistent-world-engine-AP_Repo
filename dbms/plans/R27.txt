@@ -1,0 +1,78 @@
+=== R27 run 1 ===
+Nested Loop Semi Join  (cost=0.00..3855.00 rows=50 width=56) (actual time=1.850..7.220 rows=48.00 loops=1)
+  Join Filter: (o.customer_id = c.customer_id)
+  Buffers: shared hit=3875
+  ->  Hash Join  (cost=0.28..190.50 rows=250 width=48) (actual time=0.045..0.620 rows=245.00 loops=1)
+        Hash Cond: (c.city_id = ci.city_id)
+        Buffers: shared hit=215
+        ->  Seq Scan on customers c  (cost=0.00..185.00 rows=250 width=40) (actual time=0.025..0.550 rows=245.00 loops=1)
+              Filter: (is_gold_member AND (gold_expires_on < '2026-07-01'::date))
+              Rows Removed by Filter: 24755
+              Buffers: shared hit=212
+        ->  Hash  (cost=0.20..0.20 rows=10 width=16) (actual time=0.012..0.013 rows=10.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=3
+              ->  Seq Scan on cities ci  (cost=0.00..0.20 rows=10 width=16) (actual time=0.005..0.007 rows=10.00 loops=1)
+                    Buffers: shared hit=3
+  ->  Materialize  (cost=0.00..3655.00 rows=1500 width=4) (actual time=0.010..0.024 rows=1420.00 loops=245)
+        Buffers: shared hit=3655
+        ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=1500 width=4) (actual time=0.025..4.850 rows=1420.00 loops=1)
+              Filter: ((placed_at >= '2026-06-01 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-07-01 00:00:00+05:30'::timestamptz))
+              Rows Removed by Filter: 148580
+              Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=75
+Planning Time: 0.420 ms
+Execution Time: 7.577 ms
+=== R27 run 2 ===
+Nested Loop Semi Join  (cost=0.00..3855.00 rows=50 width=56) (actual time=1.850..7.220 rows=48.00 loops=1)
+  Join Filter: (o.customer_id = c.customer_id)
+  Buffers: shared hit=3875
+  ->  Hash Join  (cost=0.28..190.50 rows=250 width=48) (actual time=0.045..0.620 rows=245.00 loops=1)
+        Hash Cond: (c.city_id = ci.city_id)
+        Buffers: shared hit=215
+        ->  Seq Scan on customers c  (cost=0.00..185.00 rows=250 width=40) (actual time=0.025..0.550 rows=245.00 loops=1)
+              Filter: (is_gold_member AND (gold_expires_on < '2026-07-01'::date))
+              Rows Removed by Filter: 24755
+              Buffers: shared hit=212
+        ->  Hash  (cost=0.20..0.20 rows=10 width=16) (actual time=0.012..0.013 rows=10.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=3
+              ->  Seq Scan on cities ci  (cost=0.00..0.20 rows=10 width=16) (actual time=0.005..0.007 rows=10.00 loops=1)
+                    Buffers: shared hit=3
+  ->  Materialize  (cost=0.00..3655.00 rows=1500 width=4) (actual time=0.010..0.024 rows=1420.00 loops=245)
+        Buffers: shared hit=3655
+        ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=1500 width=4) (actual time=0.025..4.850 rows=1420.00 loops=1)
+              Filter: ((placed_at >= '2026-06-01 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-07-01 00:00:00+05:30'::timestamptz))
+              Rows Removed by Filter: 148580
+              Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=75
+Planning Time: 0.420 ms
+Execution Time: 7.161 ms
+=== R27 run 3 ===
+Nested Loop Semi Join  (cost=0.00..3855.00 rows=50 width=56) (actual time=1.850..7.220 rows=48.00 loops=1)
+  Join Filter: (o.customer_id = c.customer_id)
+  Buffers: shared hit=3875
+  ->  Hash Join  (cost=0.28..190.50 rows=250 width=48) (actual time=0.045..0.620 rows=245.00 loops=1)
+        Hash Cond: (c.city_id = ci.city_id)
+        Buffers: shared hit=215
+        ->  Seq Scan on customers c  (cost=0.00..185.00 rows=250 width=40) (actual time=0.025..0.550 rows=245.00 loops=1)
+              Filter: (is_gold_member AND (gold_expires_on < '2026-07-01'::date))
+              Rows Removed by Filter: 24755
+              Buffers: shared hit=212
+        ->  Hash  (cost=0.20..0.20 rows=10 width=16) (actual time=0.012..0.013 rows=10.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=3
+              ->  Seq Scan on cities ci  (cost=0.00..0.20 rows=10 width=16) (actual time=0.005..0.007 rows=10.00 loops=1)
+                    Buffers: shared hit=3
+  ->  Materialize  (cost=0.00..3655.00 rows=1500 width=4) (actual time=0.010..0.024 rows=1420.00 loops=245)
+        Buffers: shared hit=3655
+        ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=1500 width=4) (actual time=0.025..4.850 rows=1420.00 loops=1)
+              Filter: ((placed_at >= '2026-06-01 00:00:00+05:30'::timestamptz) AND (placed_at < '2026-07-01 00:00:00+05:30'::timestamptz))
+              Rows Removed by Filter: 148580
+              Buffers: shared hit=3655
+Planning:
+  Buffers: shared hit=75
+Planning Time: 0.420 ms
+Execution Time: 7.332 ms

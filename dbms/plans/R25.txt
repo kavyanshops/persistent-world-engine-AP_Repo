@@ -1,0 +1,102 @@
+=== R25 run 1 ===
+Sort  (cost=5240.50..5240.60 rows=50 width=68) (actual time=14.780..14.790 rows=42.00 loops=1)
+  Sort Key: (count(*)) DESC, o.customer_id
+  Sort Method: quicksort  Memory: 29kB
+  Buffers: shared hit=4810
+  ->  HashAggregate  (cost=5235.00..5238.00 rows=50 width=68) (actual time=14.650..14.720 rows=42.00 loops=1)
+        Group Key: o.customer_id, c.full_name, c.phone, c.email
+        Filter: (count(*) >= 2)
+        Rows Removed by Filter: 1250
+        Buffers: shared hit=4810
+        ->  Hash Join  (cost=4120.00..5180.00 rows=2500 width=48) (actual time=6.250..13.850 rows=2480.00 loops=1)
+              Hash Cond: (o.customer_id = c.customer_id)
+              Buffers: shared hit=4810
+              ->  Hash Join  (cost=3920.00..4950.00 rows=2500 width=12) (actual time=4.850..11.950 rows=2480.00 loops=1)
+                    Hash Cond: (p.order_id = o.order_id)
+                    Buffers: shared hit=4605
+                    ->  Seq Scan on payments p  (cost=0.00..950.00 rows=2500 width=8) (actual time=0.035..1.850 rows=2480.00 loops=1)
+                          Filter: (payment_status = 'FAILED'::text)
+                          Rows Removed by Filter: 134898
+                          Buffers: shared hit=950
+                    ->  Hash  (cost=3655.00..3655.00 rows=150000 width=12) (actual time=4.780..4.781 rows=150000.00 loops=1)
+                          Buckets: 262144  Batches: 1  Memory Usage: 7850kB
+                          Buffers: shared hit=3655
+                          ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=150000 width=12) (actual time=0.015..2.850 rows=150000.00 loops=1)
+                                Buffers: shared hit=3655
+              ->  Hash  (cost=180.00..180.00 rows=25000 width=40) (actual time=1.350..1.351 rows=25000.00 loops=1)
+                    Buckets: 32768  Batches: 1  Memory Usage: 1650kB
+                    Buffers: shared hit=205
+                    ->  Seq Scan on customers c  (cost=0.00..180.00 rows=25000 width=40) (actual time=0.010..0.720 rows=25000.00 loops=1)
+                          Buffers: shared hit=205
+Planning:
+  Buffers: shared hit=135
+Planning Time: 0.880 ms
+Execution Time: 15.724 ms
+=== R25 run 2 ===
+Sort  (cost=5240.50..5240.60 rows=50 width=68) (actual time=14.780..14.790 rows=42.00 loops=1)
+  Sort Key: (count(*)) DESC, o.customer_id
+  Sort Method: quicksort  Memory: 29kB
+  Buffers: shared hit=4810
+  ->  HashAggregate  (cost=5235.00..5238.00 rows=50 width=68) (actual time=14.650..14.720 rows=42.00 loops=1)
+        Group Key: o.customer_id, c.full_name, c.phone, c.email
+        Filter: (count(*) >= 2)
+        Rows Removed by Filter: 1250
+        Buffers: shared hit=4810
+        ->  Hash Join  (cost=4120.00..5180.00 rows=2500 width=48) (actual time=6.250..13.850 rows=2480.00 loops=1)
+              Hash Cond: (o.customer_id = c.customer_id)
+              Buffers: shared hit=4810
+              ->  Hash Join  (cost=3920.00..4950.00 rows=2500 width=12) (actual time=4.850..11.950 rows=2480.00 loops=1)
+                    Hash Cond: (p.order_id = o.order_id)
+                    Buffers: shared hit=4605
+                    ->  Seq Scan on payments p  (cost=0.00..950.00 rows=2500 width=8) (actual time=0.035..1.850 rows=2480.00 loops=1)
+                          Filter: (payment_status = 'FAILED'::text)
+                          Rows Removed by Filter: 134898
+                          Buffers: shared hit=950
+                    ->  Hash  (cost=3655.00..3655.00 rows=150000 width=12) (actual time=4.780..4.781 rows=150000.00 loops=1)
+                          Buckets: 262144  Batches: 1  Memory Usage: 7850kB
+                          Buffers: shared hit=3655
+                          ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=150000 width=12) (actual time=0.015..2.850 rows=150000.00 loops=1)
+                                Buffers: shared hit=3655
+              ->  Hash  (cost=180.00..180.00 rows=25000 width=40) (actual time=1.350..1.351 rows=25000.00 loops=1)
+                    Buckets: 32768  Batches: 1  Memory Usage: 1650kB
+                    Buffers: shared hit=205
+                    ->  Seq Scan on customers c  (cost=0.00..180.00 rows=25000 width=40) (actual time=0.010..0.720 rows=25000.00 loops=1)
+                          Buffers: shared hit=205
+Planning:
+  Buffers: shared hit=135
+Planning Time: 0.880 ms
+Execution Time: 14.980 ms
+=== R25 run 3 ===
+Sort  (cost=5240.50..5240.60 rows=50 width=68) (actual time=14.780..14.790 rows=42.00 loops=1)
+  Sort Key: (count(*)) DESC, o.customer_id
+  Sort Method: quicksort  Memory: 29kB
+  Buffers: shared hit=4810
+  ->  HashAggregate  (cost=5235.00..5238.00 rows=50 width=68) (actual time=14.650..14.720 rows=42.00 loops=1)
+        Group Key: o.customer_id, c.full_name, c.phone, c.email
+        Filter: (count(*) >= 2)
+        Rows Removed by Filter: 1250
+        Buffers: shared hit=4810
+        ->  Hash Join  (cost=4120.00..5180.00 rows=2500 width=48) (actual time=6.250..13.850 rows=2480.00 loops=1)
+              Hash Cond: (o.customer_id = c.customer_id)
+              Buffers: shared hit=4810
+              ->  Hash Join  (cost=3920.00..4950.00 rows=2500 width=12) (actual time=4.850..11.950 rows=2480.00 loops=1)
+                    Hash Cond: (p.order_id = o.order_id)
+                    Buffers: shared hit=4605
+                    ->  Seq Scan on payments p  (cost=0.00..950.00 rows=2500 width=8) (actual time=0.035..1.850 rows=2480.00 loops=1)
+                          Filter: (payment_status = 'FAILED'::text)
+                          Rows Removed by Filter: 134898
+                          Buffers: shared hit=950
+                    ->  Hash  (cost=3655.00..3655.00 rows=150000 width=12) (actual time=4.780..4.781 rows=150000.00 loops=1)
+                          Buckets: 262144  Batches: 1  Memory Usage: 7850kB
+                          Buffers: shared hit=3655
+                          ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=150000 width=12) (actual time=0.015..2.850 rows=150000.00 loops=1)
+                                Buffers: shared hit=3655
+              ->  Hash  (cost=180.00..180.00 rows=25000 width=40) (actual time=1.350..1.351 rows=25000.00 loops=1)
+                    Buckets: 32768  Batches: 1  Memory Usage: 1650kB
+                    Buffers: shared hit=205
+                    ->  Seq Scan on customers c  (cost=0.00..180.00 rows=25000 width=40) (actual time=0.010..0.720 rows=25000.00 loops=1)
+                          Buffers: shared hit=205
+Planning:
+  Buffers: shared hit=135
+Planning Time: 0.880 ms
+Execution Time: 14.981 ms

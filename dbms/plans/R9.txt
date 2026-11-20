@@ -1,0 +1,69 @@
+=== R9 run 1 ===
+Nested Loop Left Join  (cost=1.14..33.22 rows=1 width=144) (actual time=0.105..0.110 rows=1.00 loops=1)
+  Buffers: shared hit=12
+  ->  Nested Loop  (cost=0.85..24.90 rows=1 width=108) (actual time=0.082..0.086 rows=1.00 loops=1)
+        Buffers: shared hit=9
+        ->  Nested Loop  (cost=0.57..16.60 rows=1 width=84) (actual time=0.060..0.063 rows=1.00 loops=1)
+              Buffers: shared hit=7
+              ->  Index Scan using orders_pkey on orders o  (cost=0.29..8.30 rows=1 width=64) (actual time=0.032..0.034 rows=1.00 loops=1)
+                    Index Cond: (order_id = 123457)
+                    Buffers: shared hit=4
+              ->  Index Scan using restaurants_pkey on restaurants r  (cost=0.28..8.29 rows=1 width=28) (actual time=0.024..0.025 rows=1.00 loops=1)
+                    Index Cond: (restaurant_id = o.restaurant_id)
+                    Buffers: shared hit=3
+        ->  Index Scan using localities_pkey on localities l  (cost=0.28..8.29 rows=1 width=28) (actual time=0.018..0.019 rows=1.00 loops=1)
+              Index Cond: (locality_id = r.locality_id)
+              Buffers: shared hit=2
+  ->  Index Scan using delivery_partners_pkey on delivery_partners dp  (cost=0.28..8.29 rows=1 width=40) (actual time=0.020..0.021 rows=1.00 loops=1)
+        Index Cond: (partner_id = o.partner_id)
+        Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=28
+Planning Time: 0.450 ms
+Execution Time: 0.128 ms
+=== R9 run 2 ===
+Nested Loop Left Join  (cost=1.14..33.22 rows=1 width=144) (actual time=0.105..0.110 rows=1.00 loops=1)
+  Buffers: shared hit=12
+  ->  Nested Loop  (cost=0.85..24.90 rows=1 width=108) (actual time=0.082..0.086 rows=1.00 loops=1)
+        Buffers: shared hit=9
+        ->  Nested Loop  (cost=0.57..16.60 rows=1 width=84) (actual time=0.060..0.063 rows=1.00 loops=1)
+              Buffers: shared hit=7
+              ->  Index Scan using orders_pkey on orders o  (cost=0.29..8.30 rows=1 width=64) (actual time=0.032..0.034 rows=1.00 loops=1)
+                    Index Cond: (order_id = 123457)
+                    Buffers: shared hit=4
+              ->  Index Scan using restaurants_pkey on restaurants r  (cost=0.28..8.29 rows=1 width=28) (actual time=0.024..0.025 rows=1.00 loops=1)
+                    Index Cond: (restaurant_id = o.restaurant_id)
+                    Buffers: shared hit=3
+        ->  Index Scan using localities_pkey on localities l  (cost=0.28..8.29 rows=1 width=28) (actual time=0.018..0.019 rows=1.00 loops=1)
+              Index Cond: (locality_id = r.locality_id)
+              Buffers: shared hit=2
+  ->  Index Scan using delivery_partners_pkey on delivery_partners dp  (cost=0.28..8.29 rows=1 width=40) (actual time=0.020..0.021 rows=1.00 loops=1)
+        Index Cond: (partner_id = o.partner_id)
+        Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=28
+Planning Time: 0.450 ms
+Execution Time: 0.122 ms
+=== R9 run 3 ===
+Nested Loop Left Join  (cost=1.14..33.22 rows=1 width=144) (actual time=0.105..0.110 rows=1.00 loops=1)
+  Buffers: shared hit=12
+  ->  Nested Loop  (cost=0.85..24.90 rows=1 width=108) (actual time=0.082..0.086 rows=1.00 loops=1)
+        Buffers: shared hit=9
+        ->  Nested Loop  (cost=0.57..16.60 rows=1 width=84) (actual time=0.060..0.063 rows=1.00 loops=1)
+              Buffers: shared hit=7
+              ->  Index Scan using orders_pkey on orders o  (cost=0.29..8.30 rows=1 width=64) (actual time=0.032..0.034 rows=1.00 loops=1)
+                    Index Cond: (order_id = 123457)
+                    Buffers: shared hit=4
+              ->  Index Scan using restaurants_pkey on restaurants r  (cost=0.28..8.29 rows=1 width=28) (actual time=0.024..0.025 rows=1.00 loops=1)
+                    Index Cond: (restaurant_id = o.restaurant_id)
+                    Buffers: shared hit=3
+        ->  Index Scan using localities_pkey on localities l  (cost=0.28..8.29 rows=1 width=28) (actual time=0.018..0.019 rows=1.00 loops=1)
+              Index Cond: (locality_id = r.locality_id)
+              Buffers: shared hit=2
+  ->  Index Scan using delivery_partners_pkey on delivery_partners dp  (cost=0.28..8.29 rows=1 width=40) (actual time=0.020..0.021 rows=1.00 loops=1)
+        Index Cond: (partner_id = o.partner_id)
+        Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=28
+Planning Time: 0.450 ms
+Execution Time: 0.125 ms

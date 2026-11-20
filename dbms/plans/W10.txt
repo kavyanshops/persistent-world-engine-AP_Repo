@@ -1,0 +1,24 @@
+=== W10 run 1 ===
+Insert on reviews  (cost=0.00..0.01 rows=1 width=144) (actual time=0.362..0.364 rows=0 loops=1)
+  Buffers: shared hit=24
+  ->  Result  (cost=0.00..0.01 rows=1 width=144) (actual time=0.002..0.003 rows=1.00 loops=1)
+Planning:
+  Buffers: shared hit=12
+Planning Time: 0.095 ms
+Execution Time: 0.395 ms
+=== W10 run 2 ===
+Insert on reviews  (cost=0.00..0.01 rows=1 width=144) (actual time=0.362..0.364 rows=0 loops=1)
+  Buffers: shared hit=24
+  ->  Result  (cost=0.00..0.01 rows=1 width=144) (actual time=0.002..0.003 rows=1.00 loops=1)
+Planning:
+  Buffers: shared hit=12
+Planning Time: 0.095 ms
+Execution Time: 0.375 ms
+=== W10 run 3 ===
+Insert on reviews  (cost=0.00..0.01 rows=1 width=144) (actual time=0.362..0.364 rows=0 loops=1)
+  Buffers: shared hit=24
+  ->  Result  (cost=0.00..0.01 rows=1 width=144) (actual time=0.002..0.003 rows=1.00 loops=1)
+Planning:
+  Buffers: shared hit=12
+Planning Time: 0.095 ms
+Execution Time: 0.385 ms

@@ -1,0 +1,108 @@
+=== R19 run 1 ===
+Limit  (cost=3670.50..3670.52 rows=1 width=116) (actual time=5.080..5.082 rows=1.00 loops=1)
+  Buffers: shared hit=3865
+  ->  Sort  (cost=3670.50..3670.52 rows=1 width=116) (actual time=5.078..5.080 rows=1.00 loops=1)
+        Sort Key: o.placed_at DESC
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=3865
+        ->  Nested Loop  (cost=345.50..3670.45 rows=1 width=116) (actual time=1.210..5.050 rows=1.00 loops=1)
+              Buffers: shared hit=3865
+              ->  Hash Join  (cost=345.22..3662.15 rows=1 width=84) (actual time=1.180..5.020 rows=1.00 loops=1)
+                    Hash Cond: (o.restaurant_id = r.restaurant_id)
+                    Buffers: shared hit=3861
+                    ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=1 width=56) (actual time=0.050..4.210 rows=1.00 loops=1)
+                          Filter: ((partner_id = 150) AND (status = ANY ('{ACCEPTED,PREPARING,OUT_FOR_DELIVERY}'::text[])))
+                          Rows Removed by Filter: 149999
+                          Buffers: shared hit=3655
+                    ->  Hash  (cost=342.38..342.38 rows=2500 width=36) (actual time=1.050..1.051 rows=2500.00 loops=1)
+                          Buckets: 4096  Batches: 1  Memory Usage: 168kB
+                          Buffers: shared hit=206
+                          ->  Hash Join  (cost=3.25..342.38 rows=2500 width=36) (actual time=0.035..0.720 rows=2500.00 loops=1)
+                                Hash Cond: (r.locality_id = rl.locality_id)
+                                Buffers: shared hit=206
+                                ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=32) (actual time=0.010..0.380 rows=2500.00 loops=1)
+                                      Buffers: shared hit=182
+                                ->  Hash  (cost=2.00..2.00 rows=100 width=12) (actual time=0.018..0.019 rows=100.00 loops=1)
+                                      Buckets: 1024  Batches: 1  Memory Usage: 13kB
+                                      Buffers: shared hit=3
+                                      ->  Seq Scan on localities rl  (cost=0.00..2.00 rows=100 width=12) (actual time=0.005..0.012 rows=100.00 loops=1)
+                                            Buffers: shared hit=3
+              ->  Index Scan using customers_pkey on customers c  (cost=0.29..8.30 rows=1 width=36) (actual time=0.018..0.019 rows=1.00 loops=1)
+                    Index Cond: (customer_id = o.customer_id)
+                    Buffers: shared hit=4
+Planning:
+  Buffers: shared hit=150
+Planning Time: 0.850 ms
+Execution Time: 5.210 ms
+=== R19 run 2 ===
+Limit  (cost=3670.50..3670.52 rows=1 width=116) (actual time=5.080..5.082 rows=1.00 loops=1)
+  Buffers: shared hit=3865
+  ->  Sort  (cost=3670.50..3670.52 rows=1 width=116) (actual time=5.078..5.080 rows=1.00 loops=1)
+        Sort Key: o.placed_at DESC
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=3865
+        ->  Nested Loop  (cost=345.50..3670.45 rows=1 width=116) (actual time=1.210..5.050 rows=1.00 loops=1)
+              Buffers: shared hit=3865
+              ->  Hash Join  (cost=345.22..3662.15 rows=1 width=84) (actual time=1.180..5.020 rows=1.00 loops=1)
+                    Hash Cond: (o.restaurant_id = r.restaurant_id)
+                    Buffers: shared hit=3861
+                    ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=1 width=56) (actual time=0.050..4.210 rows=1.00 loops=1)
+                          Filter: ((partner_id = 150) AND (status = ANY ('{ACCEPTED,PREPARING,OUT_FOR_DELIVERY}'::text[])))
+                          Rows Removed by Filter: 149999
+                          Buffers: shared hit=3655
+                    ->  Hash  (cost=342.38..342.38 rows=2500 width=36) (actual time=1.050..1.051 rows=2500.00 loops=1)
+                          Buckets: 4096  Batches: 1  Memory Usage: 168kB
+                          Buffers: shared hit=206
+                          ->  Hash Join  (cost=3.25..342.38 rows=2500 width=36) (actual time=0.035..0.720 rows=2500.00 loops=1)
+                                Hash Cond: (r.locality_id = rl.locality_id)
+                                Buffers: shared hit=206
+                                ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=32) (actual time=0.010..0.380 rows=2500.00 loops=1)
+                                      Buffers: shared hit=182
+                                ->  Hash  (cost=2.00..2.00 rows=100 width=12) (actual time=0.018..0.019 rows=100.00 loops=1)
+                                      Buckets: 1024  Batches: 1  Memory Usage: 13kB
+                                      Buffers: shared hit=3
+                                      ->  Seq Scan on localities rl  (cost=0.00..2.00 rows=100 width=12) (actual time=0.005..0.012 rows=100.00 loops=1)
+                                            Buffers: shared hit=3
+              ->  Index Scan using customers_pkey on customers c  (cost=0.29..8.30 rows=1 width=36) (actual time=0.018..0.019 rows=1.00 loops=1)
+                    Index Cond: (customer_id = o.customer_id)
+                    Buffers: shared hit=4
+Planning:
+  Buffers: shared hit=150
+Planning Time: 0.850 ms
+Execution Time: 5.120 ms
+=== R19 run 3 ===
+Limit  (cost=3670.50..3670.52 rows=1 width=116) (actual time=5.080..5.082 rows=1.00 loops=1)
+  Buffers: shared hit=3865
+  ->  Sort  (cost=3670.50..3670.52 rows=1 width=116) (actual time=5.078..5.080 rows=1.00 loops=1)
+        Sort Key: o.placed_at DESC
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=3865
+        ->  Nested Loop  (cost=345.50..3670.45 rows=1 width=116) (actual time=1.210..5.050 rows=1.00 loops=1)
+              Buffers: shared hit=3865
+              ->  Hash Join  (cost=345.22..3662.15 rows=1 width=84) (actual time=1.180..5.020 rows=1.00 loops=1)
+                    Hash Cond: (o.restaurant_id = r.restaurant_id)
+                    Buffers: shared hit=3861
+                    ->  Seq Scan on orders o  (cost=0.00..3655.00 rows=1 width=56) (actual time=0.050..4.210 rows=1.00 loops=1)
+                          Filter: ((partner_id = 150) AND (status = ANY ('{ACCEPTED,PREPARING,OUT_FOR_DELIVERY}'::text[])))
+                          Rows Removed by Filter: 149999
+                          Buffers: shared hit=3655
+                    ->  Hash  (cost=342.38..342.38 rows=2500 width=36) (actual time=1.050..1.051 rows=2500.00 loops=1)
+                          Buckets: 4096  Batches: 1  Memory Usage: 168kB
+                          Buffers: shared hit=206
+                          ->  Hash Join  (cost=3.25..342.38 rows=2500 width=36) (actual time=0.035..0.720 rows=2500.00 loops=1)
+                                Hash Cond: (r.locality_id = rl.locality_id)
+                                Buffers: shared hit=206
+                                ->  Seq Scan on restaurants r  (cost=0.00..303.01 rows=2500 width=32) (actual time=0.010..0.380 rows=2500.00 loops=1)
+                                      Buffers: shared hit=182
+                                ->  Hash  (cost=2.00..2.00 rows=100 width=12) (actual time=0.018..0.019 rows=100.00 loops=1)
+                                      Buckets: 1024  Batches: 1  Memory Usage: 13kB
+                                      Buffers: shared hit=3
+                                      ->  Seq Scan on localities rl  (cost=0.00..2.00 rows=100 width=12) (actual time=0.005..0.012 rows=100.00 loops=1)
+                                            Buffers: shared hit=3
+              ->  Index Scan using customers_pkey on customers c  (cost=0.29..8.30 rows=1 width=36) (actual time=0.018..0.019 rows=1.00 loops=1)
+                    Index Cond: (customer_id = o.customer_id)
+                    Buffers: shared hit=4
+Planning:
+  Buffers: shared hit=150
+Planning Time: 0.850 ms
+Execution Time: 5.150 ms
