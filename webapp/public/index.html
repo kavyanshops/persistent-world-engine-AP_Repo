@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zomato Ops Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">z</span><span>zomato<span class="brand-dot">.</span></span></div>
+        <div class="workspace-label">OPERATIONS CONSOLE</div>
+        <nav class="nav-list" aria-label="Primary navigation">
+          <a class="nav-item active" href="#overview"><span class="nav-icon">◈</span>Overview</a>
+          <a class="nav-item" href="#orders"><span class="nav-icon">≡</span>Orders</a>
+          <a class="nav-item" href="#restaurants"><span class="nav-icon">⌂</span>Restaurants</a>
+          <a class="nav-item" href="#delivery"><span class="nav-icon">↗</span>Delivery network</a>
+        </nav>
+        <div class="sidebar-footer"><div class="system-state"><span class="pulse"></span><span>Database connected</span></div><span class="version">AP / LOCAL</span></div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div><p class="eyebrow">Saturday, 21 November 2026</p><h1>Good morning, operations.</h1></div>
+          <div class="topbar-actions"><button class="icon-button" id="refresh" title="Refresh dashboard" aria-label="Refresh dashboard">↻</button><div class="avatar">KS</div></div>
+        </header>
+
+        <section id="overview" class="hero-row">
+          <div><p class="section-kicker">LIVE CONTROL ROOM</p><h2>One view of the city.</h2><p class="hero-copy">A calm read on orders, delivery health, and the restaurants carrying today's volume.</p></div>
+          <div class="hero-note"><span class="note-line"></span><div><strong>All systems nominal</strong><span>Last sync <b id="last-sync">just now</b></span></div></div>
+        </section>
+
+        <section class="metric-grid" aria-label="Key metrics">
+          <article class="metric-card accent"><div class="metric-label">TOTAL ORDERS</div><div class="metric-value" id="orders-count">--</div><div class="metric-foot"><span class="trend up">↑ 8.4%</span><span>vs last month</span></div></article>
+          <article class="metric-card"><div class="metric-label">DELIVERED</div><div class="metric-value" id="delivered-count">--</div><div class="metric-foot"><span class="trend up">↑ 3.1%</span><span>completion rate</span></div></article>
+          <article class="metric-card"><div class="metric-label">AVG DELIVERY</div><div class="metric-value"><span id="delivery-time">--</span><small> min</small></div><div class="metric-foot"><span class="trend down">↓ 1.8%</span><span>faster this week</span></div></article>
+          <article class="metric-card"><div class="metric-label">NEEDS ATTENTION</div><div class="metric-value" id="attention-count">--</div><div class="metric-foot"><span class="status-dot warning"></span><span>active queue</span></div></article>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel order-panel" id="orders"><div class="panel-heading"><div><p class="section-kicker">ORDER STREAM</p><h3>Latest movement</h3></div><button class="text-button" id="load-more">View all <span>→</span></button></div><div class="table-wrap"><table><thead><tr><th>ORDER</th><th>CUSTOMER</th><th>RESTAURANT</th><th>STATUS</th><th class="align-right">VALUE</th></tr></thead><tbody id="orders-table"><tr><td colspan="5" class="loading">Loading order stream...</td></tr></tbody></table></div></article>
+          <article class="panel payment-panel" id="delivery"><div class="panel-heading"><div><p class="section-kicker">PAYMENT HEALTH</p><h3>Gateway pulse</h3></div><span class="panel-badge">LAST 24H</span></div><div class="payment-visual"><div class="donut" id="payment-donut"><div class="donut-center"><strong id="success-rate">--</strong><span>success</span></div></div><div class="payment-legend"><div><span class="legend-swatch success"></span><span>Successful</span><strong id="success-count">--</strong></div><div><span class="legend-swatch failed"></span><span>Failed</span><strong id="failed-count">--</strong></div></div></div><div class="payment-foot"><span class="status-dot"></span><span>Payment processing is stable</span></div></article>
+        </section>
+
+        <section class="panel restaurants-panel" id="restaurants"><div class="panel-heading"><div><p class="section-kicker">PARTNER PERFORMANCE</p><h3>Restaurants by delivered volume</h3></div><span class="panel-badge">TOP 6</span></div><div class="restaurant-list" id="restaurant-list"><div class="loading">Loading partner data...</div></div></section>
+        <footer class="footer"><span>ZOMATO OPERATIONS CONSOLE</span><span>Connected to PostgreSQL · <span id="footer-time">--</span></span></footer>
+      </main>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>

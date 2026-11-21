@@ -213,3 +213,19 @@ added as an alternate key, but it is not assumed here.
    partners, coupons, menu items, orders, and reviews.
 6. Boolean and status values use constrained PostgreSQL types or `CHECK`
    constraints in the final schema.
+
+## Seed-data exceptions
+
+The supplied CSV files contain three valid historical missing-value cases that
+must be accepted by the schema:
+
+- 124 restaurants have no `rating` value. A missing rating is different from a
+  zero rating, so `restaurants.rating` is nullable.
+- 21,405 reviews have no `review_text`. The review record and its numeric
+  ratings are still usable, so `reviews.review_text` is nullable.
+- 7,741 reviews have no `delivery_rating`. The food rating and review record
+  remain valid, so `reviews.delivery_rating` is nullable.
+
+Expired Gold members can also retain their historical `gold_expires_on` date
+after `is_gold_member` becomes false. The schema therefore does not require
+the expiry date to be null when membership is inactive.

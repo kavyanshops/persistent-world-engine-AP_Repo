@@ -24,8 +24,7 @@ CREATE TABLE customers (
     signup_date date NOT NULL,
     is_gold_member boolean NOT NULL DEFAULT false,
     gold_expires_on date,
-    is_active boolean NOT NULL DEFAULT true,
-    CHECK (is_gold_member OR gold_expires_on IS NULL)
+    is_active boolean NOT NULL DEFAULT true
 );
 
 CREATE TABLE restaurants (
@@ -34,7 +33,7 @@ CREATE TABLE restaurants (
     locality_id integer NOT NULL REFERENCES localities(locality_id) ON DELETE RESTRICT,
     cuisines text[] NOT NULL CHECK (cardinality(cuisines) > 0),
     avg_cost_for_two numeric(10,2) NOT NULL CHECK (avg_cost_for_two >= 0),
-    rating numeric(2,1) NOT NULL CHECK (rating BETWEEN 0 AND 5),
+    rating numeric(2,1) CHECK (rating BETWEEN 0 AND 5),
     rating_count integer NOT NULL DEFAULT 0 CHECK (rating_count >= 0),
     opens_at time NOT NULL,
     closes_at time NOT NULL,
@@ -122,7 +121,7 @@ CREATE TABLE reviews (
     customer_id integer NOT NULL REFERENCES customers(customer_id) ON DELETE RESTRICT,
     restaurant_id integer NOT NULL REFERENCES restaurants(restaurant_id) ON DELETE RESTRICT,
     food_rating smallint NOT NULL CHECK (food_rating BETWEEN 1 AND 5),
-    delivery_rating smallint NOT NULL CHECK (delivery_rating BETWEEN 1 AND 5),
-    review_text text NOT NULL CHECK (length(trim(review_text)) > 0),
+    delivery_rating smallint CHECK (delivery_rating BETWEEN 1 AND 5),
+    review_text text CHECK (review_text IS NULL OR length(trim(review_text)) > 0),
     created_at timestamptz NOT NULL
 );
