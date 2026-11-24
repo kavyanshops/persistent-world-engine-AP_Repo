@@ -87,9 +87,18 @@ window.addEventListener('api:complete', (event) => {
 /* ---------- health ---------- */
 async function health() {
   const el = $('#health');
-  try { const r = await raw('GET', '/api/health'); if (r.status !== 200) throw 0; el.className = 'live ok'; el.lastElementChild.textContent = 'API + PostgreSQL up'; }
-    const hero = $('#heroHealth'); if (hero) hero.innerHTML = '<span class="health-pulse"></span><strong>API + database connected</strong>';
-  catch { el.className = 'live bad'; el.lastElementChild.textContent = 'Backend unavailable'; const hero = $('#heroHealth'); if (hero) hero.innerHTML = '<span class="health-pulse down"></span><strong>Backend unavailable</strong>'; }
+  const hero = $('#heroHealth');
+  try {
+    const r = await raw('GET', '/api/health');
+    if (r.status !== 200) throw new Error('Health check failed');
+    el.className = 'live ok';
+    el.lastElementChild.textContent = 'API + PostgreSQL up';
+    if (hero) hero.innerHTML = '<span class="health-pulse"></span><strong>API + database connected</strong>';
+  } catch {
+    el.className = 'live bad';
+    el.lastElementChild.textContent = 'Backend unavailable';
+    if (hero) hero.innerHTML = '<span class="health-pulse down"></span><strong>Backend unavailable</strong>';
+  }
 }
 
 /* ---------- login / session UI ---------- */
