@@ -20,6 +20,36 @@ Demo accounts (printed at startup):
 | manager | manager.blr@zomato.test | Manager@12345 | read and update orders, **Bengaluru only** |
 | analyst | analyst@zomato.test | Analyst@12345 | read-only, plus schema and query lab |
 
+
+## Evaluation walkthrough
+
+The UI is intentionally arranged for a live backend review: sign-in → operational dashboard → middleware architecture → request inspector → security scenarios → audit and SQL labs.
+
+1. Start PostgreSQL and make sure the `zomato_ap` database is loaded with the project dataset.
+2. From `webapp/`, install dependencies and start the API:
+
+   ```bash
+   npm install
+   export JWT_SECRET='replace-with-a-long-random-local-demo-secret'
+   # Set PGPASSWORD if your local PostgreSQL role requires one.
+   npm start
+   ```
+
+   The default database connection is `localhost:5432`, database `zomato_ap`, and the current OS username. Override it with `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`, or `DATABASE_URL` as needed. Open `http://localhost:3000`.
+
+3. Sign in as admin first to show the complete dashboard, order controls, audit events and live EXPLAIN. Use the role shortcuts to switch between manager and analyst:
+   - Admin: `admin@zomato.test` / `Admin@12345`
+   - Manager: `manager.blr@zomato.test` / `Manager@12345`
+   - Analyst: `analyst@zomato.test` / `Analyst@12345`
+
+4. Open browser DevTools → Console. Each API call appears as a collapsed `[API →]` group. Expand it to inspect the request ID, whether a Bearer token was attached, response status, elapsed time, middleware trace, selected security headers and redacted response body. Passwords and JWTs are redacted from console output. The page also keeps the last eight calls in its Live request activity panel.
+5. Open DevTools → Network and select an `/api/...` request. Inspect `X-Request-Id` and `X-Middleware-Trace` in Response Headers. The Request Inspector displays the same trace and response body in the page.
+6. Run all security scenarios. The suite fires 18 real HTTP requests and compares observed status codes with expected outcomes. For a focused demonstration, use the presets for missing token (401), analyst write attempt (403), malformed query (400), unknown order (404), and forged JWT (401).
+7. Switch roles to demonstrate authorization: the manager can read/update only Bengaluru orders; the analyst can read data and query/schema information but cannot update orders; admin can inspect security audit and run read-only `EXPLAIN (ANALYZE, BUFFERS)`.
+
+**Data-changing demo:** the order Update control sends a real `PATCH /api/orders/:id/status`. Choose a listed order and one of its displayed next states. The backend validates the transition and locks the row in a transaction. Use the evaluation dataset only; a successful update persists in PostgreSQL.
+
+
 ## Layout
 
 ```
