@@ -14,6 +14,20 @@ try { auth = JSON.parse(sessionStorage.getItem('auth') || 'null'); } catch { aut
 const saveAuth = () => { try { auth ? sessionStorage.setItem('auth', JSON.stringify(auth)) : sessionStorage.removeItem('auth'); } catch {} };
 
 /* ---------- HTTP ---------- */
+function redactConsoleValue(value) {
+  if (typeof value === 'string') {
+    try { return redactConsoleValue(JSON.parse(value)); } catch { return value; }
+  }
+  if (Array.isArray(value)) return value.map(redactConsoleValue);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, entry]) => [
+      key,
+      /(password|token|secret|authorization|cookie)/i.test(key) ? '[REDACTED]' : redactConsoleValue(entry)
+    ]));
+  }
+  return value;
+}
+
 /* ---------- observable HTTP client: every browser API call is visible in DevTools ---------- */
 async function raw(method, path, { token, body, rawBody } = {}) {
   const headers = {};
@@ -26,7 +40,7 @@ async function raw(method, path, { token, body, rawBody } = {}) {
   console.groupCollapsed(`%c[API →] ${method} ${path}`, 'color:#287a55;font-weight:bold');
   console.log('Request ID:', requestId);
   console.log('Authorization:', token ? 'Bearer token attached' : 'No bearer token');
-  if (payload !== undefined) console.log('Request body:', payload);
+  if (payload !== undefined) console.log('Request body:', redactConsoleValue(payload));
   let res, text, json;
   try {
     res = await fetch(path, { method, headers, body: payload });
@@ -45,7 +59,7 @@ async function raw(method, path, { token, body, rawBody } = {}) {
   console.log(`%c[API ←] ${res.status} ${res.statusText} · ${elapsed.toFixed(1)} ms`, methodStyle);
   console.log('Middleware trace:', trace);
   console.log('Response headers:', responseHeaders);
-  console.log('Response body:', json ?? text);
+  console.log('Response body:', redactConsoleValue(json ?? text));
   console.groupEnd();
   window.dispatchEvent(new CustomEvent('api:complete', { detail: { method, path, status: res.status, ms: elapsed, requestId, trace } }));
   return result;
