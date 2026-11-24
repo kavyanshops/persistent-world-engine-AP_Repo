@@ -14,20 +14,46 @@ try { auth = JSON.parse(sessionStorage.getItem('auth') || 'null'); } catch { aut
 const saveAuth = () => { try { auth ? sessionStorage.setItem('auth', JSON.stringify(auth)) : sessionStorage.removeItem('auth'); } catch {} };
 
 /* ---------- HTTP ---------- */
+/* ---------- observable HTTP client: every browser API call is visible in DevTools ---------- */
 async function raw(method, path, { token, body, rawBody } = {}) {
   const headers = {};
   if (token) headers.authorization = 'Bearer ' + token;
   if (body !== undefined || rawBody !== undefined) headers['content-type'] = 'application/json';
-  const t0 = performance.now();
-  const res = await fetch(path, { method, headers, body: rawBody ?? (body !== undefined ? JSON.stringify(body) : undefined) });
-  const text = await res.text();
-  let json = null; try { json = JSON.parse(text); } catch {}
-  return { status: res.status, ms: performance.now() - t0, headers: res.headers, json, text };
+  const requestId = (globalThis.crypto?.randomUUID?.() || ('demo-' + Date.now() + '-' + Math.random().toString(16).slice(2))).replace(/[^\w-]/g, '');
+  headers['x-request-id'] = requestId;
+  const started = performance.now();
+  const payload = rawBody ?? (body !== undefined ? JSON.stringify(body) : undefined);
+  console.groupCollapsed(`%c[API →] ${method} ${path}`, 'color:#287a55;font-weight:bold');
+  console.log('Request ID:', requestId);
+  console.log('Authorization:', token ? 'Bearer token attached' : 'No bearer token');
+  if (payload !== undefined) console.log('Request body:', payload);
+  let res, text, json;
+  try {
+    res = await fetch(path, { method, headers, body: payload });
+    text = await res.text();
+    json = null; try { json = JSON.parse(text); } catch {}
+  } catch (error) {
+    console.error('[NETWORK ERROR]', error);
+    console.groupEnd();
+    throw error;
+  }
+  const elapsed = performance.now() - started;
+  const trace = res.headers.get('x-middleware-trace') || '(trace header unavailable)';
+  const responseHeaders = Object.fromEntries(['x-request-id','x-middleware-trace','x-ratelimit-limit','x-ratelimit-remaining','retry-after','www-authenticate','content-security-policy','x-content-type-options','x-frame-options','cache-control'].map(k => [k, res.headers.get(k)]).filter(([,v]) => v));
+  const result = { status: res.status, ms: elapsed, headers: res.headers, json, text, requestId, trace };
+  const methodStyle = res.ok ? 'color:#287a55;font-weight:bold' : 'color:#b3443b;font-weight:bold';
+  console.log(`%c[API ←] ${res.status} ${res.statusText} · ${elapsed.toFixed(1)} ms`, methodStyle);
+  console.log('Middleware trace:', trace);
+  console.log('Response headers:', responseHeaders);
+  console.log('Response body:', json ?? text);
+  console.groupEnd();
+  window.dispatchEvent(new CustomEvent('api:complete', { detail: { method, path, status: res.status, ms: elapsed, requestId, trace } }));
+  return result;
 }
 async function api(path, opts = {}) {
-  const r = await raw(opts.method || 'GET', path, { token: auth && auth.token, body: opts.body });
+  const r = await raw(opts.method || 'GET', path, { token: auth && auth.token, body: opts.body, rawBody: opts.rawBody });
   if (r.status === 401 && auth) { signOutLocal('Session ended: ' + (r.json?.error?.message || 'please sign in again.')); }
-  if (r.status >= 400) { const e = new Error(r.json?.error?.message || 'Request failed'); e.status = r.status; throw e; }
+  if (r.status >= 400) { const e = new Error(r.json?.error?.message || 'Request failed'); e.status = r.status; e.response = r; throw e; }
   return r.json;
 }
 const can = (p) => !!(auth && auth.user.permissions.includes(p));
@@ -201,6 +227,15 @@ async function loadAudit() {
 }
 $('#auditBtn').addEventListener('click', loadAudit);
 
+function showToast(message, success) {
+  let toast = document.getElementById('toast');
+  if (!toast) { toast = document.createElement('div'); toast.id = 'toast'; toast.className = 'toast'; document.body.appendChild(toast); }
+  toast.textContent = message;
+  toast.className = 'toast ' + (success ? 'success' : 'failure');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => toast.classList.remove('success','failure'), 3600);
+}
+
 /* ---------- protected data panels ---------- */
 const lock = (name, perm, msg) => {
   const ok = perm ? can(perm) : !!auth;
@@ -214,8 +249,29 @@ async function overview() {
   $('#scopeTag').textContent = 'scope: ' + o.scope;
   $('#kpis').innerHTML = [['ORDERS', num(o.orders), '', 1], ['CUSTOMERS', num(o.customers)], ['RESTAURANTS', num(o.restaurants)], ['ACTIVE PARTNERS', num(o.active_partners)], ['AVG DELIVERY', o.avg_delivery_minutes, ' min'], ['IN PROGRESS', num(o.attention), ' orders']]
     .map(([l, v, s = '', hi]) => `<div class="kpi ${hi ? 'hi' : ''}"><span>${l}</span><strong>${esc(v)}<small>${s}</small></strong></div>`).join('');
-  $('#orders').innerHTML = '<tr><th>Order</th><th>Customer</th><th>Restaurant</th><th>Status</th><th class="r">Total</th></tr>' + orders.data.map((x) =>
-    `<tr><td class="mono">#${x.order_id}</td><td>${esc(x.customer_name)}</td><td>${esc(x.restaurant_name)}</td><td>${stat(x.status)}</td><td class="r"><b>${inr(x.total_amount)}</b></td></tr>`).join('');
+  $('#orders').innerHTML = '<tr><th>Order</th><th>Customer</th><th>Restaurant</th><th>Status</th><th class="r">Total</th><th>Action</th></tr>' + orders.data.map((x) => {
+    const next = ({ PLACED: ['ACCEPTED','CANCELLED_BY_RESTAURANT'], ACCEPTED: ['PREPARING','CANCELLED_BY_RESTAURANT'], PREPARING: ['OUT_FOR_DELIVERY'], OUT_FOR_DELIVERY: ['DELIVERED'] })[x.status] || [];
+    const actions = can('orders:update') && next.length
+      ? `<select class="order-next" aria-label="Next status for order ${x.order_id}" data-order="${x.order_id}">${next.map(s => `<option value="${s}">${s.replaceAll('_',' ')}</option>`).join('')}</select><button class="btn sm order-update" data-order="${x.order_id}">Update</button>`
+      : '<span class="note">Read only</span>';
+    return `<tr><td class="mono">#${x.order_id}</td><td>${esc(x.customer_name)}</td><td>${esc(x.restaurant_name)}</td><td>${stat(x.status)}</td><td class="r"><b>${inr(x.total_amount)}</b></td><td>${actions}</td></tr>`;
+  }).join('');
+  $('#orders').querySelectorAll('.order-update').forEach(button => button.addEventListener('click', async () => {
+    const id = button.dataset.order;
+    const select = $('#orders').querySelector(`.order-next[data-order="${id}"]`);
+    if (!select) return;
+    button.disabled = true; button.textContent = 'Saving…';
+    try {
+      const result = await api(`/api/orders/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: { status: select.value } });
+      console.info('[ORDER UPDATED]', result);
+      await overview();
+      showToast(`Order #${id} changed to ${result.status}`, true);
+    } catch (error) {
+      console.error('[ORDER UPDATE FAILED]', error, error.response?.json);
+      showToast(`${error.status || 'Network'} · ${error.message}`, false);
+      button.disabled = false; button.textContent = 'Retry';
+    }
+  }));
   const ok = Number(o.successful), bad = Number(o.failed), rate = ok + bad ? (ok / (ok + bad)) * 100 : 0;
   $('#rate').textContent = rate.toFixed(1) + '%'; $('#ok').textContent = num(ok); $('#bad').textContent = num(bad);
   $('#donut').style.setProperty('--p', rate * 3.6 + 'deg');
@@ -260,7 +316,16 @@ $('#seg').addEventListener('click', (e) => { const b = e.target.closest('button'
 
 function afterAuthChange() {
   renderSession(); tick();
-  const fail = (id) => (e) => { const el = $(`#${id}-lock`); el.hidden = false; $(`#${id}-data`).hidden = true; el.textContent = 'Could not load: ' + e.message; };
+  const fail = (id) => (e) => { const el = $(`#${id}-lock`); el.hidden = false; $(`#${id}-data`).hidden = true; el.textContent = 'Could not load: ' + e.message; console.error('[SECTION LOAD FAILED]', id, e); };
+  if (!auth) {
+    ['overview','schema','queries'].forEach(id => { $(`#${id}-lock`).hidden = false; $(`#${id}-data`).hidden = true; });
+    $('#overview-lock').textContent = 'Sign in to load live operational data.';
+    $('#schema-lock').textContent = 'Sign in as analyst or admin to inspect the schema.';
+    $('#queries-lock').textContent = 'Sign in as analyst or admin to open the query lab.';
+    $('#perf-data').hidden = true;
+    $('#auditBody').innerHTML = '<div class="locked">Sign in as admin to view security events.</div>';
+    return;
+  }
   overview().catch(fail('overview')); schema().catch(fail('schema')); queryLab().catch(fail('queries')); loadAudit();
 }
 
