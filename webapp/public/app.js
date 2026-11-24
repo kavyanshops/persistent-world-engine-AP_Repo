@@ -58,11 +58,24 @@ async function api(path, opts = {}) {
 }
 const can = (p) => !!(auth && auth.user.permissions.includes(p));
 
+window.addEventListener('api:complete', (event) => {
+  const { method, path, status, ms: elapsed, requestId, trace } = event.detail;
+  const list = $('#activityList'); if (!list) return;
+  if (list.querySelector('.note')) list.innerHTML = '';
+  const row = document.createElement('div'); row.className = 'activity-row';
+  const ok = status >= 200 && status < 300;
+  row.innerHTML = `<span class="activity-method ${method.toLowerCase()}">${esc(method)}</span><span class="activity-path">${esc(path)}</span><b class="activity-status ${ok ? 'good' : 'bad'}">${status}</b><span class="activity-time">${Number(elapsed).toFixed(1)} ms</span><span class="activity-id" title="${esc(requestId)}">${esc(requestId.slice(0,8))}</span>`;
+  row.title = trace;
+  list.prepend(row);
+  while (list.children.length > 8) list.lastElementChild.remove();
+});
+
 /* ---------- health ---------- */
 async function health() {
   const el = $('#health');
   try { const r = await raw('GET', '/api/health'); if (r.status !== 200) throw 0; el.className = 'live ok'; el.lastElementChild.textContent = 'API + PostgreSQL up'; }
-  catch { el.className = 'live bad'; el.lastElementChild.textContent = 'Backend unavailable'; }
+    const hero = $('#heroHealth'); if (hero) hero.innerHTML = '<span class="health-pulse"></span><strong>API + database connected</strong>';
+  catch { el.className = 'live bad'; el.lastElementChild.textContent = 'Backend unavailable'; const hero = $('#heroHealth'); if (hero) hero.innerHTML = '<span class="health-pulse down"></span><strong>Backend unavailable</strong>'; }
 }
 
 /* ---------- login / session UI ---------- */
