@@ -1,4 +1,5 @@
 const path = require('node:path');
+const fs = require('node:fs');
 const express = require('express');
 const { Pool } = require('pg');
 
@@ -14,7 +15,27 @@ const pool = new Pool({
 });
 
 app.use(express.json());
+const DBMS = path.join(__dirname, '..', 'dbms');
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/dbms', express.static(DBMS));
+
+// Parse dbms/04_queries.sql (-- @ID markers) and the recorded timings in dbms/05_query_timings.md
+function loadQueries() {
+  const parts = fs.readFileSync(path.join(DBMS, '04_queries.sql'), 'utf8').split(/^-- @(\w+)\s*$/m);
+  const timings = {};
+  for (const line of fs.readFileSync(path.join(DBMS, '05_query_timings.md'), 'utf8').split('\n')) {
+    const c = line.split('|').map((x) => x.trim());
+    if (/^[RW]\d+$/.test(c[1] || '')) timings[c[1]] = { runs: [c[4], c[5], c[6]].map(Number), avg: Number(c[7]), scan: c[8] };
+  }
+  const out = [];
+  for (let i = 1; i < parts.length; i += 2) {
+    const lines = parts[i + 1].split('\n');
+    const title = (lines.find((l) => l.startsWith('-- ')) || '').replace(/^-- (READ|WRITE):\s*/, '');
+    const sql = lines.filter((l) => !l.trim().startsWith('--')).join('\n').trim();
+    out.push({ id: parts[i], type: parts[i][0] === 'R' ? 'READ' : 'WRITE', title, sql, ...(timings[parts[i]] || {}) });
+  }
+  return out;
+}
 
 async function query(text, values = []) {
   const result = await pool.query(text, values);
@@ -99,6 +120,41 @@ app.get('/api/restaurants', async (_req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+app.get('/api/queries', (_req, res, next) => {
+  try { res.json(loadQueries()); } catch (error) { next(error); }
+});
+
+// Live EXPLAIN (ANALYZE, BUFFERS) for READ queries only, inside a read-only transaction that is always rolled back.
+app.get('/api/explain/:id', async (req, res, next) => {
+  const q = loadQueries().find((x) => x.id === req.params.id);
+  if (!q) return res.status(404).json({ error: 'Unknown query id' });
+  if (q.type !== 'READ') return res.status(400).json({ error: 'Live EXPLAIN is limited to READ queries.' });
+  let client;
+  try {
+    client = await pool.connect();
+    await client.query('BEGIN READ ONLY');
+    await client.query('SET LOCAL search_path TO zomato');
+    const r = await client.query(`EXPLAIN (ANALYZE, BUFFERS) ${q.sql.replace(/;\s*$/, '')}`);
+    res.json({ id: q.id, plan: r.rows.map((row) => row['QUERY PLAN']) });
+  } catch (error) { next(error); } finally { if (client) { await client.query('ROLLBACK').catch(() => {}); client.release(); } }
+});
+
+app.get('/api/schema', async (_req, res, next) => {
+  try {
+    res.json(await query(`
+      SELECT c.relname AS table_name, c.reltuples::bigint AS approx_rows,
+        (SELECT count(*) FROM information_schema.columns k WHERE k.table_schema = 'zomato' AND k.table_name = c.relname)::int AS columns,
+        (SELECT count(*) FROM pg_constraint k WHERE k.conrelid = c.oid AND k.contype = 'p')::int AS pk,
+        (SELECT count(*) FROM pg_constraint k WHERE k.conrelid = c.oid AND k.contype = 'f')::int AS fk,
+        (SELECT count(*) FROM pg_constraint k WHERE k.conrelid = c.oid AND k.contype = 'u')::int AS uniq,
+        (SELECT count(*) FROM pg_constraint k WHERE k.conrelid = c.oid AND k.contype = 'c')::int AS checks,
+        (SELECT count(*) FROM pg_index i WHERE i.indrelid = c.oid)::int AS indexes,
+        pg_size_pretty(pg_total_relation_size(c.oid)) AS size
+      FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'zomato' AND c.relkind = 'r' ORDER BY c.relname`));
+  } catch (error) { next(error); }
 });
 
 app.use((error, _req, res, _next) => {

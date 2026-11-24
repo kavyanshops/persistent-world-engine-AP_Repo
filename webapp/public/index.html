@@ -1,55 +1,74 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zomato Ops Console</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <div class="app-shell">
-      <aside class="sidebar">
-        <div class="brand"><span class="brand-mark">z</span><span>zomato<span class="brand-dot">.</span></span></div>
-        <div class="workspace-label">OPERATIONS CONSOLE</div>
-        <nav class="nav-list" aria-label="Primary navigation">
-          <a class="nav-item active" href="#overview"><span class="nav-icon">◈</span>Overview</a>
-          <a class="nav-item" href="#orders"><span class="nav-icon">≡</span>Orders</a>
-          <a class="nav-item" href="#restaurants"><span class="nav-icon">⌂</span>Restaurants</a>
-          <a class="nav-item" href="#delivery"><span class="nav-icon">↗</span>Delivery network</a>
-        </nav>
-        <div class="sidebar-footer"><div class="system-state"><span class="pulse"></span><span>Database connected</span></div><span class="version">AP / LOCAL</span></div>
-      </aside>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Zomato Backend Console · Team T0102</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<header class="nav"><div class="wrap nav-in">
+  <a class="brand" href="#top"><span class="mark">z</span>zomato<i>.</i><small>backend console</small></a>
+  <nav><a href="#overview">Overview</a><a href="#architecture">Architecture</a><a href="#schema">Schema</a><a href="#queries">Query Lab</a><a href="#performance">Performance</a><a href="#normalization">Normalization</a></nav>
+  <span class="live" id="health"><b></b><span>checking…</span></span>
+</div></header>
 
-      <main class="main-content">
-        <header class="topbar">
-          <div><p class="eyebrow">Saturday, 21 November 2026</p><h1>Good morning, operations.</h1></div>
-          <div class="topbar-actions"><button class="icon-button" id="refresh" title="Refresh dashboard" aria-label="Refresh dashboard">↻</button><div class="avatar">KS</div></div>
-        </header>
+<main id="top">
+<section class="hero wrap"><p class="kicker">DBMS · APPLICATION PROJECT · TEAM T0102 · SECTION B</p>
+  <h1>A food-delivery backend, built on a <em>normalized PostgreSQL schema</em>.</h1>
+  <p class="lead">11 tables in 3NF, 41 application queries, and a measured execution plan for every one. Everything on this page is read live from the database.</p>
+  <div class="chips"><span>PostgreSQL 16</span><span>Node.js + Express</span><span>3NF / BCNF</span><span>150,000 orders</span></div></section>
 
-        <section id="overview" class="hero-row">
-          <div><p class="section-kicker">LIVE CONTROL ROOM</p><h2>One view of the city.</h2><p class="hero-copy">A calm read on orders, delivery health, and the restaurants carrying today's volume.</p></div>
-          <div class="hero-note"><span class="note-line"></span><div><strong>All systems nominal</strong><span>Last sync <b id="last-sync">just now</b></span></div></div>
-        </section>
+<section id="overview" class="wrap"><h2>Live database overview</h2>
+  <div class="kpis" id="kpis"><div class="loading">Loading…</div></div>
+  <div class="grid2">
+    <article class="card"><div class="ch"><h3>Latest orders</h3><span class="tag">orders ⋈ customers ⋈ restaurants ⋈ localities</span></div><div class="scroll"><table id="orders"></table></div></article>
+    <article class="card"><div class="ch"><h3>Payment attempts</h3><span class="tag">all time</span></div><div class="donutbox"><div class="donut" id="donut"><div><strong id="rate">–</strong><span>success</span></div></div><ul class="legend"><li><i class="g"></i>Successful <b id="ok">–</b></li><li><i class="a"></i>Failed <b id="bad">–</b></li></ul></div></article>
+  </div>
+  <article class="card"><div class="ch"><h3>Top restaurants by delivered orders</h3><span class="tag">LEFT JOIN + FILTER aggregate</span></div><div id="rests"></div></article>
+</section>
 
-        <section class="metric-grid" aria-label="Key metrics">
-          <article class="metric-card accent"><div class="metric-label">TOTAL ORDERS</div><div class="metric-value" id="orders-count">--</div><div class="metric-foot"><span class="trend up">↑ 8.4%</span><span>vs last month</span></div></article>
-          <article class="metric-card"><div class="metric-label">DELIVERED</div><div class="metric-value" id="delivered-count">--</div><div class="metric-foot"><span class="trend up">↑ 3.1%</span><span>completion rate</span></div></article>
-          <article class="metric-card"><div class="metric-label">AVG DELIVERY</div><div class="metric-value"><span id="delivery-time">--</span><small> min</small></div><div class="metric-foot"><span class="trend down">↓ 1.8%</span><span>faster this week</span></div></article>
-          <article class="metric-card"><div class="metric-label">NEEDS ATTENTION</div><div class="metric-value" id="attention-count">--</div><div class="metric-foot"><span class="status-dot warning"></span><span>active queue</span></div></article>
-        </section>
+<section id="architecture" class="wrap"><h2>Architecture</h2>
+  <div class="flow">
+    <div class="node"><b>Browser</b><span>HTML · CSS · vanilla JS</span></div><div class="arrow">→</div>
+    <div class="node"><b>Express API</b><span>/api/overview · orders · restaurants · schema · queries · explain</span></div><div class="arrow">→</div>
+    <div class="node hl"><b>PostgreSQL 16</b><span>schema <code>zomato</code> · 11 tables · constraints only, no tuning indexes</span></div>
+  </div>
+  <div class="grid3">
+    <div class="card pad"><h4>Parameterised access</h4><p>Every user-supplied value goes through <code>$1</code> placeholders in <code>pg</code>. No string-built SQL.</p></div>
+    <div class="card pad"><h4>Safe live EXPLAIN</h4><p>The Query Lab runs <code>EXPLAIN (ANALYZE, BUFFERS)</code> for READ queries only, inside a <code>READ ONLY</code> transaction that is always rolled back.</p></div>
+    <div class="card pad"><h4>Single source of truth</h4><p>Queries and recorded timings are parsed straight from <code>dbms/04_queries.sql</code> and <code>dbms/05_query_timings.md</code>.</p></div>
+  </div>
+</section>
 
-        <section class="content-grid">
-          <article class="panel order-panel" id="orders"><div class="panel-heading"><div><p class="section-kicker">ORDER STREAM</p><h3>Latest movement</h3></div><button class="text-button" id="load-more">View all <span>→</span></button></div><div class="table-wrap"><table><thead><tr><th>ORDER</th><th>CUSTOMER</th><th>RESTAURANT</th><th>STATUS</th><th class="align-right">VALUE</th></tr></thead><tbody id="orders-table"><tr><td colspan="5" class="loading">Loading order stream...</td></tr></tbody></table></div></article>
-          <article class="panel payment-panel" id="delivery"><div class="panel-heading"><div><p class="section-kicker">PAYMENT HEALTH</p><h3>Gateway pulse</h3></div><span class="panel-badge">LAST 24H</span></div><div class="payment-visual"><div class="donut" id="payment-donut"><div class="donut-center"><strong id="success-rate">--</strong><span>success</span></div></div><div class="payment-legend"><div><span class="legend-swatch success"></span><span>Successful</span><strong id="success-count">--</strong></div><div><span class="legend-swatch failed"></span><span>Failed</span><strong id="failed-count">--</strong></div></div></div><div class="payment-foot"><span class="status-dot"></span><span>Payment processing is stable</span></div></article>
-        </section>
+<section id="schema" class="wrap"><h2>Schema &amp; constraints</h2>
+  <article class="card"><div class="scroll"><table id="schema-table"></table></div></article>
+  <article class="card pad"><div class="ch"><h3>ER diagram</h3><a class="tag" href="/dbms/02_er_diagram.png" target="_blank" rel="noopener">open full size ↗</a></div><img class="er" src="/dbms/02_er_diagram.png" alt="Entity-relationship diagram of the Zomato schema" /></article>
+</section>
 
-        <section class="panel restaurants-panel" id="restaurants"><div class="panel-heading"><div><p class="section-kicker">PARTNER PERFORMANCE</p><h3>Restaurants by delivered volume</h3></div><span class="panel-badge">TOP 6</span></div><div class="restaurant-list" id="restaurant-list"><div class="loading">Loading partner data...</div></div></section>
-        <footer class="footer"><span>ZOMATO OPERATIONS CONSOLE</span><span>Connected to PostgreSQL · <span id="footer-time">--</span></span></footer>
-      </main>
-    </div>
-    <script src="/app.js"></script>
-  </body>
-</html>
+<section id="queries" class="wrap"><h2>Query Lab</h2>
+  <p class="sub">Pick a query to see its SQL and recorded timing. READ queries can be re-run live with a real execution plan.</p>
+  <div class="lab"><div class="qlist"><div class="seg" id="seg"><button data-f="ALL" class="on">All</button><button data-f="READ">Read</button><button data-f="WRITE">Write</button></div><div id="qitems"></div></div>
+  <div class="qview card pad" id="qview"><div class="loading">Select a query</div></div></div>
+</section>
+
+<section id="performance" class="wrap"><h2>Performance baseline</h2>
+  <p class="sub">Average of 3 runs per query (from <code>dbms/05_query_timings.md</code>). Colour shows the access method in the plan.</p>
+  <article class="card pad"><div class="keyrow"><span><i class="g"></i>Index scan</span><span><i class="a"></i>Seq scan</span><span><i class="n"></i>No scan (insert)</span></div><div id="bars"></div></article>
+  <div class="grid3" id="perfstats"></div>
+</section>
+
+<section id="normalization" class="wrap"><h2>Normalization path</h2>
+  <div class="steps">
+    <div class="card pad"><span class="n">0NF</span><p>One wide order record with repeating item and payment groups and a multi-valued <code>cuisines</code> field.</p></div>
+    <div class="card pad"><span class="n">1NF</span><p>Atomic values. Repeating groups become rows: <code>order_items</code>, <code>payments</code>, one review per order.</p></div>
+    <div class="card pad"><span class="n">2NF</span><p>Partial dependencies removed. Item facts live in <code>menu_items</code>; <code>order_items</code> keeps only quantity and sale price.</p></div>
+    <div class="card pad"><span class="n">3NF</span><p>Transitive dependencies removed: city → locality → restaurant → order. Natural keys stay <code>UNIQUE</code>.</p></div>
+  </div>
+</section>
+</main>
+<footer class="wrap foot"><span>Kavyansh Saini · Ansh Verma · Aditya Singh · Rajat Soni</span><span>Rishihood University · DBMS · Team T0102</span></footer>
+<script src="/app.js"></script>
+</body></html>
