@@ -39,7 +39,7 @@ router.get('/overview', authorize('overview:read'), async (req, res, next) => {
       FROM zomato.payments p JOIN zomato.orders o ON o.order_id = p.order_id
       JOIN zomato.restaurants r ON r.restaurant_id = o.restaurant_id JOIN zomato.localities l ON l.locality_id = r.locality_id
       WHERE ($1::int IS NULL OR l.city_id = $1)`, [city]);
-    const [p] = await query(`SELECT count(*) AS active_partners FROM zomato.delivery_partners WHERE status = 'ACTIVE'`);
+    const [p] = await query(`SELECT count(*) AS active_partners FROM zomato.delivery_partners WHERE status = 'ACTIVE' AND ($1::int IS NULL OR city_id = $1)`, [city]);
     res.json({ scope: city == null ? 'all cities' : `city ${city}`, ...row, ...pay, ...p });
   } catch (e) { next(e); }
 });
