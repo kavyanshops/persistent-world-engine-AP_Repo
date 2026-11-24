@@ -3,72 +3,120 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Zomato Backend Console · Team T0102</title>
+<title>Zomato Backend Console · Auth &amp; Middleware · Team T0102</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:," />
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
 <header class="nav"><div class="wrap nav-in">
   <a class="brand" href="#top"><span class="mark">z</span>zomato<i>.</i><small>backend console</small></a>
-  <nav><a href="#overview">Overview</a><a href="#architecture">Architecture</a><a href="#schema">Schema</a><a href="#queries">Query Lab</a><a href="#performance">Performance</a><a href="#normalization">Normalization</a></nav>
+  <nav><a href="#pipeline">Pipeline</a><a href="#access">Auth</a><a href="#inspector">Inspector</a><a href="#scenarios">Scenarios</a><a href="#audit">Audit</a><a href="#overview">Data</a><a href="#queries">Queries</a><a href="#schema">Schema</a></nav>
+  <span class="who" id="who"></span>
   <span class="live" id="health"><b></b><span>checking…</span></span>
 </div></header>
 
 <main id="top">
-<section class="hero wrap"><p class="kicker">DBMS · APPLICATION PROJECT · TEAM T0102 · SECTION B</p>
-  <h1>A food-delivery backend, built on a <em>normalized PostgreSQL schema</em>.</h1>
-  <p class="lead">11 tables in 3NF, 41 application queries, and a measured execution plan for every one. Everything on this page is read live from the database.</p>
-  <div class="chips"><span>PostgreSQL 16</span><span>Node.js + Express</span><span>3NF / BCNF</span><span>150,000 orders</span></div></section>
+<section class="hero wrap"><p class="kicker">APPLICATION PROGRAMMING · BACKEND · TEAM T0102 · SECTION B</p>
+  <h1>A Node.js API with an <em>ordered middleware pipeline</em>, JWT login and role-based access.</h1>
+  <p class="lead">Every request below passes through the same nine steps. Sign in, fire requests at the real server, and watch each one get accepted or stopped, with the exact status code and the middleware that decided it.</p>
+  <div class="chips"><span>Node.js 22 + Express 4</span><span>JWT (HS256, pinned)</span><span>bcrypt password hashing</span><span>RBAC + city data scope</span><span>Rate limiting</span><span>Schema validation</span><span>PostgreSQL 16</span></div></section>
 
-<section id="overview" class="wrap"><h2>Live database overview</h2>
-  <div class="kpis" id="kpis"><div class="loading">Loading…</div></div>
-  <div class="grid2">
-    <article class="card"><div class="ch"><h3>Latest orders</h3><span class="tag">orders ⋈ customers ⋈ restaurants ⋈ localities</span></div><div class="scroll"><table id="orders"></table></div></article>
-    <article class="card"><div class="ch"><h3>Payment attempts</h3><span class="tag">all time</span></div><div class="donutbox"><div class="donut" id="donut"><div><strong id="rate">–</strong><span>success</span></div></div><ul class="legend"><li><i class="g"></i>Successful <b id="ok">–</b></li><li><i class="a"></i>Failed <b id="bad">–</b></li></ul></div></article>
-  </div>
-  <article class="card"><div class="ch"><h3>Top restaurants by delivered orders</h3><span class="tag">LEFT JOIN + FILTER aggregate</span></div><div id="rests"></div></article>
+<section id="pipeline" class="wrap"><h2>The request pipeline</h2>
+  <p class="sub">Order matters. Each step relies on the ones above it, and any step can end the request early. Source: <code>src/app.js</code> and <code>src/middleware/</code>.</p>
+  <ol class="pipe" id="pipe">
+    <li><b>1 · trace</b><span>Starts a per-request trace, returned as <code>X-Middleware-Trace</code>.</span></li>
+    <li><b>2 · requestId</b><span>Gives every request an id. It appears in the response, the log and every error body.</span></li>
+    <li><b>3 · securityHeaders</b><span>CSP, <code>nosniff</code>, frame deny, no-store on API replies. Hides <code>X-Powered-By</code>.</span></li>
+    <li><b>4 · logger</b><span>Writes one JSON line per request when the response finishes, and feeds the audit log.</span></li>
+    <li><b>5 · rateLimit</b><span>300 requests per minute per IP. Login has its own limit: 5 per minute per IP and email. Ends with <b class="c429">429</b>.</span></li>
+    <li><b>6 · express.json</b><span>Parses JSON, capped at 10 kB. Bad JSON gives <b class="c400">400</b>, too large gives <b class="c400">413</b>.</span></li>
+    <li><b>7 · authenticate</b><span>Verifies the Bearer JWT: signature, algorithm, issuer, audience, expiry, revocation. Fails with <b class="c401">401</b>.</span></li>
+    <li><b>8 · authorize + validate</b><span>Checks the role's permission (<b class="c403">403</b>) and the shape of params, query and body (<b class="c400">400</b>).</span></li>
+    <li><b>9 · handler → errorHandler</b><span>Runs the parameterised SQL. Missing row <b class="c404">404</b>, illegal state change <b class="c409">409</b>. All errors leave through one handler.</span></li>
+  </ol>
+  <div class="card pad codes"><h4>Which status code means what</h4>
+    <div class="codegrid"><div><b class="c401">401</b><span>We do not know who you are</span></div><div><b class="c403">403</b><span>We know you, and the answer is no</span></div><div><b class="c400">400</b><span>Your request is malformed</span></div><div><b class="c404">404</b><span>Nothing there</span></div><div><b class="c409">409</b><span>Valid request, wrong state</span></div><div><b class="c429">429</b><span>Slow down</span></div></div></div>
 </section>
 
-<section id="architecture" class="wrap"><h2>Architecture</h2>
-  <div class="flow">
-    <div class="node"><b>Browser</b><span>HTML · CSS · vanilla JS</span></div><div class="arrow">→</div>
-    <div class="node"><b>Express API</b><span>/api/overview · orders · restaurants · schema · queries · explain</span></div><div class="arrow">→</div>
-    <div class="node hl"><b>PostgreSQL 16</b><span>schema <code>zomato</code> · 11 tables · constraints only, no tuning indexes</span></div>
-  </div>
-  <div class="grid3">
-    <div class="card pad"><h4>Parameterised access</h4><p>Every user-supplied value goes through <code>$1</code> placeholders in <code>pg</code>. No string-built SQL.</p></div>
-    <div class="card pad"><h4>Safe live EXPLAIN</h4><p>The Query Lab runs <code>EXPLAIN (ANALYZE, BUFFERS)</code> for READ queries only, inside a <code>READ ONLY</code> transaction that is always rolled back.</p></div>
-    <div class="card pad"><h4>Single source of truth</h4><p>Queries and recorded timings are parsed straight from <code>dbms/04_queries.sql</code> and <code>dbms/05_query_timings.md</code>.</p></div>
+<section id="access" class="wrap"><h2>Sign in and roles</h2>
+  <div class="grid2b">
+    <article class="card pad" id="loginCard">
+      <div id="loginForm">
+        <div class="ch"><h3>Login</h3><span class="tag">POST /api/auth/login</span></div>
+        <form id="form" autocomplete="off"><label>Email<input id="email" type="text" spellcheck="false" /></label><label>Password<input id="password" type="password" autocomplete="current-password" /></label><button class="btn" id="loginBtn" type="submit">Sign in</button></form>
+        <p class="note">Quick fill a demo account:</p><div class="demo" id="demo"></div><p class="err" id="loginErr"></p>
+      </div>
+      <div id="session" hidden>
+        <div class="ch"><h3>Signed in</h3><span class="tag" id="sessRole"></span></div>
+        <p id="sessWho" class="big"></p>
+        <div class="meta"><span>Token expires in <b id="sessTtl">–</b></span><span>City scope <b id="sessScope">–</b></span></div>
+        <p class="note">Decoded JWT payload. It holds only who and which token. Role and scope are looked up on the server for every request, so editing this payload gains nothing.</p>
+        <pre id="jwtView"></pre>
+        <button class="btn" id="logoutBtn">Sign out (revokes token)</button>
+      </div>
+    </article>
+    <article class="card pad"><div class="ch"><h3>Access matrix</h3><span class="tag">src/auth/rbac.js</span></div><div class="scroll"><table id="matrix"></table></div><p class="note">Routes ask for a permission, never for a role name. The manager is additionally limited to one city, which is enforced inside the SQL query.</p></article>
   </div>
 </section>
 
-<section id="schema" class="wrap"><h2>Schema &amp; constraints</h2>
-  <article class="card"><div class="scroll"><table id="schema-table"></table></div></article>
-  <article class="card pad"><div class="ch"><h3>ER diagram</h3><a class="tag" href="/dbms/02_er_diagram.png" target="_blank" rel="noopener">open full size ↗</a></div><img class="er" src="/dbms/02_er_diagram.png" alt="Entity-relationship diagram of the Zomato schema" /></article>
+<section id="inspector" class="wrap"><h2>Request inspector</h2>
+  <p class="sub">Sends a real HTTP request to this server and shows what came back, including the middleware trace.</p>
+  <div class="presets" id="presets"></div>
+  <div class="insp">
+    <article class="card pad"><form id="reqForm" autocomplete="off">
+      <div class="row"><select id="method"><option>GET</option><option>POST</option><option>PATCH</option></select><input id="path" type="text" spellcheck="false" value="/api/orders?limit=5" /></div>
+      <label>Authorization<select id="authAs"></select></label>
+      <label>JSON body<textarea id="body" rows="4" spellcheck="false" placeholder='{"status":"ACCEPTED"}'></textarea></label>
+      <button class="btn" type="submit" id="sendBtn">Send request</button></form></article>
+    <article class="card pad" id="resp"><div class="loading">Pick a preset or press Send.</div></article>
+  </div>
+</section>
+
+<section id="scenarios" class="wrap"><h2>Security scenarios</h2>
+  <p class="sub">Runs 18 real requests, each with an expected status code. Nothing here changes data.</p>
+  <article class="card pad"><div class="ch"><h3 id="scoreTitle">Not run yet</h3><button class="btn" id="runAll">Run all scenarios</button></div><div class="scroll"><table id="scen"></table></div></article>
+</section>
+
+<section id="audit" class="wrap"><h2>Audit log</h2>
+  <p class="sub">Admin only (<code>audit:read</code>). The server keeps the last 200 requests and flags 401, 403 and 429 as security events.</p>
+  <article class="card"><div class="ch"><h3>Recent security events</h3><button class="btn sm" id="auditBtn">Refresh</button></div><div id="auditBody" class="scroll"><div class="locked">Sign in as admin to view.</div></div></article>
+</section>
+
+<section id="overview" class="wrap"><h2>Live data behind the API</h2>
+  <p class="sub">These panels call protected endpoints with your token. A manager sees only Bengaluru. An analyst sees everything but cannot change it.</p>
+  <div id="overview-lock" class="locked">Sign in to load live data.</div>
+  <div id="overview-data" hidden>
+    <div class="kpis" id="kpis"></div>
+    <div class="grid2">
+      <article class="card"><div class="ch"><h3>Latest orders</h3><span class="tag" id="scopeTag">GET /api/orders</span></div><div class="scroll"><table id="orders"></table></div></article>
+      <article class="card"><div class="ch"><h3>Payment attempts</h3><span class="tag">scoped</span></div><div class="donutbox"><div class="donut" id="donut"><div><strong id="rate">–</strong><span>success</span></div></div><ul class="legend"><li><i class="g"></i>Successful <b id="ok">–</b></li><li><i class="a"></i>Failed <b id="bad">–</b></li></ul></div></article>
+    </div>
+    <article class="card"><div class="ch"><h3>Top restaurants by delivered orders</h3><span class="tag">GET /api/restaurants</span></div><div id="rests"></div></article>
+  </div>
 </section>
 
 <section id="queries" class="wrap"><h2>Query Lab</h2>
-  <p class="sub">Pick a query to see its SQL and recorded timing. READ queries can be re-run live with a real execution plan.</p>
-  <div class="lab"><div class="qlist"><div class="seg" id="seg"><button data-f="ALL" class="on">All</button><button data-f="READ">Read</button><button data-f="WRITE">Write</button></div><div id="qitems"></div></div>
+  <p class="sub">The 41 SQL queries from the database phase. Needs <code>queries:read</code> (analyst, admin). Live EXPLAIN needs <code>explain:run</code> (admin).</p>
+  <div id="queries-lock" class="locked">Sign in as analyst or admin.</div>
+  <div class="lab" id="queries-data" hidden><div class="qlist"><div class="seg" id="seg"><button data-f="ALL" class="on">All</button><button data-f="READ">Read</button><button data-f="WRITE">Write</button></div><div id="qitems"></div></div>
   <div class="qview card pad" id="qview"><div class="loading">Select a query</div></div></div>
-</section>
-
-<section id="performance" class="wrap"><h2>Performance baseline</h2>
-  <p class="sub">Average of 3 runs per query (from <code>dbms/05_query_timings.md</code>). Colour shows the access method in the plan.</p>
-  <article class="card pad"><div class="keyrow"><span><i class="g"></i>Index scan</span><span><i class="a"></i>Seq scan</span><span><i class="n"></i>No scan (insert)</span></div><div id="bars"></div></article>
-  <div class="grid3" id="perfstats"></div>
-</section>
-
-<section id="normalization" class="wrap"><h2>Normalization path</h2>
-  <div class="steps">
-    <div class="card pad"><span class="n">0NF</span><p>One wide order record with repeating item and payment groups and a multi-valued <code>cuisines</code> field.</p></div>
-    <div class="card pad"><span class="n">1NF</span><p>Atomic values. Repeating groups become rows: <code>order_items</code>, <code>payments</code>, one review per order.</p></div>
-    <div class="card pad"><span class="n">2NF</span><p>Partial dependencies removed. Item facts live in <code>menu_items</code>; <code>order_items</code> keeps only quantity and sale price.</p></div>
-    <div class="card pad"><span class="n">3NF</span><p>Transitive dependencies removed: city → locality → restaurant → order. Natural keys stay <code>UNIQUE</code>.</p></div>
+  <div id="perf-data" hidden>
+    <h3 class="subh">Performance baseline</h3><p class="sub">Average of 3 recorded runs per query. Green: index scan. Amber: sequential scan.</p>
+    <article class="card pad"><div id="bars"></div></article><div class="grid3" id="perfstats"></div>
   </div>
 </section>
+
+<section id="schema" class="wrap"><h2>Database schema</h2>
+  <div id="schema-lock" class="locked">Sign in as analyst or admin.</div>
+  <div id="schema-data" hidden>
+    <article class="card"><div class="scroll"><table id="schema-table"></table></div></article>
+    <article class="card pad"><div class="ch"><h3>ER diagram</h3><a class="tag" href="/dbms/02_er_diagram.png" target="_blank" rel="noopener">open full size ↗</a></div><img class="er" src="/dbms/02_er_diagram.png" alt="Entity-relationship diagram of the Zomato schema" /></article>
+  </div>
+  <div class="steps"><div class="card pad"><span class="n">1NF</span><p>Atomic values; repeating groups became <code>order_items</code> and <code>payments</code>.</p></div><div class="card pad"><span class="n">2NF</span><p>Item facts live in <code>menu_items</code>; order lines keep quantity and sale price.</p></div><div class="card pad"><span class="n">3NF</span><p>City → locality → restaurant → order. No transitive dependencies.</p></div></div>
+</section>
 </main>
-<footer class="wrap foot"><span>Kavyansh Saini · Ansh Verma · Aditya Singh · Rajat Soni</span><span>Rishihood University · DBMS · Team T0102</span></footer>
+<footer class="wrap foot"><span>Kavyansh Saini · Ansh Verma · Aditya Singh · Rajat Soni</span><span>Rishihood University · Application Programming · Team T0102</span></footer>
 <script src="/app.js"></script>
 </body></html>

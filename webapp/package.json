@@ -2,14 +2,17 @@
   "name": "zomato-ops-dashboard",
   "version": "1.0.0",
   "private": true,
-  "description": "PostgreSQL-backed operations dashboard for the Zomato AP project",
+  "description": "Zomato AP backend: Express API with JWT auth, RBAC, validation and a middleware pipeline, on PostgreSQL",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test": "node --test tests/security.test.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.13.1"
   }
 }
