@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Zomato Backend Console · Auth &amp; Middleware · Team T0102</title>
+<title>Zomato Ops | Backend Systems · Team T0102</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
 <link rel="icon" href="data:," />
@@ -12,32 +12,27 @@
 <body>
 <header class="nav"><div class="wrap nav-in">
   <a class="brand" href="#top"><span class="mark">z</span>zomato<i>.</i><small>backend console</small></a>
-  <nav><a href="#pipeline">Pipeline</a><a href="#access">Auth</a><a href="#inspector">Inspector</a><a href="#scenarios">Scenarios</a><a href="#audit">Audit</a><a href="#overview">Data</a><a href="#queries">Queries</a><a href="#schema">Schema</a></nav>
+  <nav><a href="#overview">Dashboard</a><a href="#access">Sign in</a><a href="#pipeline">Architecture</a><a href="#inspector">API lab</a><a href="#scenarios">Security tests</a><a href="#audit">Audit</a><a href="#queries">SQL lab</a></nav>
   <span class="who" id="who"></span>
   <span class="live" id="health"><b></b><span>checking…</span></span>
 </div></header>
 
 <main id="top">
-<section class="hero wrap"><p class="kicker">APPLICATION PROGRAMMING · BACKEND · TEAM T0102 · SECTION B</p>
-  <h1>A Node.js API with an <em>ordered middleware pipeline</em>, JWT login and role-based access.</h1>
-  <p class="lead">Every request below passes through the same nine steps. Sign in, fire requests at the real server, and watch each one get accepted or stopped, with the exact status code and the middleware that decided it.</p>
-  <div class="chips"><span>Node.js 22 + Express 4</span><span>JWT (HS256, pinned)</span><span>bcrypt password hashing</span><span>RBAC + city data scope</span><span>Rate limiting</span><span>Schema validation</span><span>PostgreSQL 16</span></div></section>
-
-<section id="pipeline" class="wrap"><h2>The request pipeline</h2>
-  <p class="sub">Order matters. Each step relies on the ones above it, and any step can end the request early. Source: <code>src/app.js</code> and <code>src/middleware/</code>.</p>
-  <ol class="pipe" id="pipe">
-    <li><b>1 · trace</b><span>Starts a per-request trace, returned as <code>X-Middleware-Trace</code>.</span></li>
-    <li><b>2 · requestId</b><span>Gives every request an id. It appears in the response, the log and every error body.</span></li>
-    <li><b>3 · securityHeaders</b><span>CSP, <code>nosniff</code>, frame deny, no-store on API replies. Hides <code>X-Powered-By</code>.</span></li>
-    <li><b>4 · logger</b><span>Writes one JSON line per request when the response finishes, and feeds the audit log.</span></li>
-    <li><b>5 · rateLimit</b><span>300 requests per minute per IP. Login has its own limit: 5 per minute per IP and email. Ends with <b class="c429">429</b>.</span></li>
-    <li><b>6 · express.json</b><span>Parses JSON, capped at 10 kB. Bad JSON gives <b class="c400">400</b>, too large gives <b class="c400">413</b>.</span></li>
-    <li><b>7 · authenticate</b><span>Verifies the Bearer JWT: signature, algorithm, issuer, audience, expiry, revocation. Fails with <b class="c401">401</b>.</span></li>
-    <li><b>8 · authorize + validate</b><span>Checks the role's permission (<b class="c403">403</b>) and the shape of params, query and body (<b class="c400">400</b>).</span></li>
-    <li><b>9 · handler → errorHandler</b><span>Runs the parameterised SQL. Missing row <b class="c404">404</b>, illegal state change <b class="c409">409</b>. All errors leave through one handler.</span></li>
-  </ol>
-  <div class="card pad codes"><h4>Which status code means what</h4>
-    <div class="codegrid"><div><b class="c401">401</b><span>We do not know who you are</span></div><div><b class="c403">403</b><span>We know you, and the answer is no</span></div><div><b class="c400">400</b><span>Your request is malformed</span></div><div><b class="c404">404</b><span>Nothing there</span></div><div><b class="c409">409</b><span>Valid request, wrong state</span></div><div><b class="c429">429</b><span>Slow down</span></div></div></div>
+<section class="hero wrap">
+  <div class="hero-copy">
+    <p class="kicker"><span class="eyebrow-dot"></span> APPLICATION PROGRAMMING · TEAM T0102 · RISHIHOOD UNIVERSITY</p>
+    <h1>Food delivery operations, powered by a <em>secure backend.</em></h1>
+    <p class="lead">A live demonstration of our Node.js and Express API: JWT authentication, role-based permissions, city-level data isolation, request validation and a traceable middleware pipeline.</p>
+    <div class="hero-actions"><a class="btn" href="#overview">Explore live dashboard <span>↓</span></a><a class="btn btn-quiet" href="#inspector">Open API inspector</a></div>
+    <div class="chips"><span>Node.js + Express</span><span>JWT + bcrypt</span><span>RBAC + city scope</span><span>PostgreSQL</span></div>
+  </div>
+  <aside class="hero-console">
+    <div class="console-top"><span><i></i><i></i><i></i></span><b>BACKEND STATUS</b><small>LIVE</small></div>
+    <div class="console-main"><div class="console-label">SERVICE HEALTH</div><div class="console-health" id="heroHealth"><span class="health-pulse"></span><strong>Checking services…</strong></div>
+      <div class="hero-stats"><div><span>API</span><b>Express 4</b></div><div><span>DATABASE</span><b>PostgreSQL</b></div><div><span>AUTH</span><b>JWT · HS256</b></div><div><span>ACCESS</span><b>Role scoped</b></div></div>
+      <div class="console-foot"><span>REQUEST INSPECTION ENABLED</span><span>● TRACE</span></div>
+    </div>
+  </aside>
 </section>
 
 <section id="access" class="wrap"><h2>Sign in and roles</h2>
@@ -61,6 +56,41 @@
   </div>
 </section>
 
+<section id="overview" class="wrap"><h2>Live data behind the API</h2>
+  <p class="sub">These panels call protected endpoints with your token. A manager sees only Bengaluru. An analyst sees everything but cannot change it.</p>
+  <div id="overview-lock" class="locked">Sign in to load live data.</div>
+  <div id="overview-data" hidden>
+    <div class="kpis" id="kpis"></div>
+    <div class="grid2">
+      <article class="card"><div class="ch"><h3>Latest orders</h3><span class="tag" id="scopeTag">GET /api/orders</span></div><div class="scroll"><table id="orders"></table></div></article>
+      <article class="card"><div class="ch"><h3>Payment attempts</h3><span class="tag">scoped</span></div><div class="donutbox"><div class="donut" id="donut"><div><strong id="rate">–</strong><span>success</span></div></div><ul class="legend"><li><i class="g"></i>Successful <b id="ok">–</b></li><li><i class="a"></i>Failed <b id="bad">–</b></li></ul></div></article>
+    </div>
+    <article class="card"><div class="ch"><h3>Top restaurants by delivered orders</h3><span class="tag">GET /api/restaurants</span></div><div id="rests"></div></article>
+  </div>
+</section>
+
+<section class="wrap activity-section" id="activity">
+  <div class="activity-heading"><div><p class="kicker">TRANSPARENT BY DESIGN</p><h2>Live request activity</h2><p class="sub">Every browser request is also grouped in the DevTools Console. Open Inspect → Console to follow the request ID, middleware trace, response and timing.</p></div><a class="text-link" href="#inspector">Run a request ↗</a></div>
+  <article class="card activity-card"><div class="ch"><h3>Recent API calls</h3><span class="tag">browser → Express → PostgreSQL</span></div><div id="activityList" class="activity-list"><p class="note">Waiting for the first API request…</p></div></article>
+</section>
+
+<section id="pipeline" class="wrap"><h2>The request pipeline</h2>
+  <p class="sub">Order matters. Each step relies on the ones above it, and any step can end the request early. Source: <code>src/app.js</code> and <code>src/middleware/</code>.</p>
+  <ol class="pipe" id="pipe">
+    <li><b>1 · trace</b><span>Starts a per-request trace, returned as <code>X-Middleware-Trace</code>.</span></li>
+    <li><b>2 · requestId</b><span>Gives every request an id. It appears in the response, the log and every error body.</span></li>
+    <li><b>3 · securityHeaders</b><span>CSP, <code>nosniff</code>, frame deny, no-store on API replies. Hides <code>X-Powered-By</code>.</span></li>
+    <li><b>4 · logger</b><span>Writes one JSON line per request when the response finishes, and feeds the audit log.</span></li>
+    <li><b>5 · rateLimit</b><span>300 requests per minute per IP. Login has its own limit: 5 per minute per IP and email. Ends with <b class="c429">429</b>.</span></li>
+    <li><b>6 · express.json</b><span>Parses JSON, capped at 10 kB. Bad JSON gives <b class="c400">400</b>, too large gives <b class="c400">413</b>.</span></li>
+    <li><b>7 · authenticate</b><span>Verifies the Bearer JWT: signature, algorithm, issuer, audience, expiry, revocation. Fails with <b class="c401">401</b>.</span></li>
+    <li><b>8 · authorize + validate</b><span>Checks the role's permission (<b class="c403">403</b>) and the shape of params, query and body (<b class="c400">400</b>).</span></li>
+    <li><b>9 · handler → errorHandler</b><span>Runs the parameterised SQL. Missing row <b class="c404">404</b>, illegal state change <b class="c409">409</b>. All errors leave through one handler.</span></li>
+  </ol>
+  <div class="card pad codes"><h4>Which status code means what</h4>
+    <div class="codegrid"><div><b class="c401">401</b><span>We do not know who you are</span></div><div><b class="c403">403</b><span>We know you, and the answer is no</span></div><div><b class="c400">400</b><span>Your request is malformed</span></div><div><b class="c404">404</b><span>Nothing there</span></div><div><b class="c409">409</b><span>Valid request, wrong state</span></div><div><b class="c429">429</b><span>Slow down</span></div></div></div>
+</section>
+
 <section id="inspector" class="wrap"><h2>Request inspector</h2>
   <p class="sub">Sends a real HTTP request to this server and shows what came back, including the middleware trace.</p>
   <div class="presets" id="presets"></div>
@@ -82,19 +112,6 @@
 <section id="audit" class="wrap"><h2>Audit log</h2>
   <p class="sub">Admin only (<code>audit:read</code>). The server keeps the last 200 requests and flags 401, 403 and 429 as security events.</p>
   <article class="card"><div class="ch"><h3>Recent security events</h3><button class="btn sm" id="auditBtn">Refresh</button></div><div id="auditBody" class="scroll"><div class="locked">Sign in as admin to view.</div></div></article>
-</section>
-
-<section id="overview" class="wrap"><h2>Live data behind the API</h2>
-  <p class="sub">These panels call protected endpoints with your token. A manager sees only Bengaluru. An analyst sees everything but cannot change it.</p>
-  <div id="overview-lock" class="locked">Sign in to load live data.</div>
-  <div id="overview-data" hidden>
-    <div class="kpis" id="kpis"></div>
-    <div class="grid2">
-      <article class="card"><div class="ch"><h3>Latest orders</h3><span class="tag" id="scopeTag">GET /api/orders</span></div><div class="scroll"><table id="orders"></table></div></article>
-      <article class="card"><div class="ch"><h3>Payment attempts</h3><span class="tag">scoped</span></div><div class="donutbox"><div class="donut" id="donut"><div><strong id="rate">–</strong><span>success</span></div></div><ul class="legend"><li><i class="g"></i>Successful <b id="ok">–</b></li><li><i class="a"></i>Failed <b id="bad">–</b></li></ul></div></article>
-    </div>
-    <article class="card"><div class="ch"><h3>Top restaurants by delivered orders</h3><span class="tag">GET /api/restaurants</span></div><div id="rests"></div></article>
-  </div>
 </section>
 
 <section id="queries" class="wrap"><h2>Query Lab</h2>
