@@ -12,6 +12,16 @@ npm test           # 13 integration tests over real HTTP, against the real datab
 
 Database settings use the usual `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` or `DATABASE_URL`. Set `JWT_SECRET` in any real deployment (without it a random secret is generated per process and tokens die on restart).
 
+### Vercel deployment
+
+Set these environment variables in Vercel:
+
+- `DATABASE_URL` — a reachable PostgreSQL connection string
+- `JWT_SECRET` — a long random secret
+- `DATABASE_SSL=true` when SSL is required and `DATABASE_URL` does not contain an SSL host
+
+Vercel cannot reach your macOS localhost PostgreSQL. Use a hosted PostgreSQL database and load the `zomato_ap` schema/data into it. The serverless entrypoint is `/api`.
+
 Demo accounts (printed at startup):
 
 | Role | Email | Password | Can do |
